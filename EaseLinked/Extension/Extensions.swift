@@ -248,3 +248,26 @@ struct RoundedCorner: Shape {
 //extension String {
 //
 //}
+
+extension Color {
+    static func from(name: String) -> Color {
+        switch name.lowercased() {
+        case "red": return .red
+        case "orange": return .orange
+        case "yellow": return .yellow
+        case "green": return .green
+        case "mint": return .mint
+        case "cyan": return .cyan
+        case "teal": return .teal
+        case "blue": return .blue
+        case "indigo": return .indigo
+        case "purple": return .purple
+        case "pink": return .pink
+        case "brown": return .brown
+        case "gray", "grey": return .gray
+        case "black": return .black
+        case "white": return .white
+        default: return .gray // fallback
+        }
+    }
+}

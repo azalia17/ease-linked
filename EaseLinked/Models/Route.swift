@@ -1,6 +1,7 @@
 
 import Foundation
 import MapKit
+import SwiftUI
 
 struct Route: Identifiable, Codable {
     let id: String
@@ -10,11 +11,17 @@ struct Route: Identifiable, Codable {
     let bus: [String]
     let schedule: [String]
     let note: [String]
+    let colorName: String  // e.g., "red", "green"
+
+    var color: Color {
+        Color.from(name: colorName)
+    }
+    
 }
 
 extension Route {
     func getRouteGeneralDetail(routeid: String) -> (String, Int, [String]){
-        let route = Route.all.filter {$0.id == routeid}.first ?? Route(id: "xx", name: "xx", routeNumber: 0, busStops: [], bus: [], schedule: [], note: ["xx"])
+        let route = Route.all.filter {$0.id == routeid}.first ?? Route(id: "xx", name: "xx", routeNumber: 0, busStops: [], bus: [], schedule: [], note: ["xx"], colorName: "black")
         return (route.name, route.routeNumber, route.note)
     }
 
@@ -99,7 +106,9 @@ extension Route {
                 "JADWAL BERWARNA KUNING HANYA BERLAKU, SABTU, MINGGU DAN HARI LIBUR BERLAKU",
                 "THE BREEZE BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL",
                 "ICE 6 BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL"
-            ]
+            ],
+            colorName: "green"
+//            color: Color(.green)
         ),
         
         Route(
@@ -170,7 +179,8 @@ extension Route {
                 "TIME TABLE SEWAKTU - WAKTU DAPAT BERUBAH MENYESUAIKAN KONDISI OPERASIONAL DAN TRAFFIC",
                 "JADWAL BERWARNA KUNING HANYA BERLAKU, SABTU, MINGGU DAN HARI LIBUR BERLAKU",
                 "THE BREEZE BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL",
-            ]
+            ],
+            colorName: "cyan"
         ),
         
         Route(
@@ -219,7 +229,8 @@ extension Route {
                 "JADWAL BERWARNA KUNING HANYA BERLAKU, SABTU, MINGGU DAN HARI LIBUR BERLAKU",
                 "ICE 6 BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL",
                 "THE BREEZE BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL"
-            ]
+            ],
+            colorName: "indigo"
         ),
         
         Route(
@@ -275,7 +286,8 @@ extension Route {
                 "JADWAL BERWARNA KUNING HANYA BERLAKU, SABTU, MINGGU DAN HARI LIBUR BERLAKU",
                 "ICE 6 BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL",
                 "THE BREEZE BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL"
-            ]
+            ],
+            colorName: "purple"
         ),
         
         Route(
@@ -309,7 +321,8 @@ extension Route {
                 "LOBBY AEON MALL BERHENTI MENUNGGU 5 MENIT ATAU MENYESUAIKAN DENGAN JADWAL",
                 "ICE 2 BERHENTI MENUNGGU 4 MENIT ATAU MENYESUAIKAN DENGAN JADWAL",
                 "ICE 6 BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL"
-            ]
+            ],
+            colorName: "pink"
         ),
         
         Route(
@@ -352,7 +365,8 @@ extension Route {
                 "JADWAL BERWARNA KUNING HANYA BERLAKU, SABTU, MINGGU DAN HARI LIBUR BERLAKU",
                 "ICE 6 BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL",
                 "VANYA PARK BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL"
-            ]
+            ],
+            colorName: "red"
         ),
         
         Route(
@@ -402,7 +416,8 @@ extension Route {
                 "QBIG BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL",
                 "THE BREEZE BERHENTI DAN MENUNGGU 2 MENIT ATAU MENYESUAIKAN DENGAN JADWAL",
                 "LOBBY AEON MALL BERHENTI DAN MENUNGGU 3 MENIT ATAU MENYESUAIKAN DENGAN JADWAL"
-            ]
+            ],
+            colorName: "brown"
         )
     ]
 }
