@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct Bus: Identifiable, Codable {
     let id: String
@@ -13,11 +14,16 @@ struct Bus: Identifiable, Codable {
     let platNumber: String
     let operationalHour: String
     var isElectric: Bool = false
+//    let colorName: String
+//    
+//    var color: Color {
+//        Color.from(name: colorName)
+//    }
 }
 
 extension Bus {
     static func getBus(by id: String) -> Bus {
-        return all.first(where: { $0.id == id }) ?? Bus(id: "000", code: "000", platNumber: "xx xxxx xx", operationalHour: "00.00 - 00.00")
+        return all.first(where: { $0.id == id }) ?? Bus(id: "000", code: "000", platNumber: "xx xxxx xx", operationalHour: "00.00 - 00.00"/* colorName: "black"*/)
     }
     
     static func getBusses(by ids: [String]) -> [Bus] {
@@ -36,6 +42,7 @@ extension Bus {
             code: "B01",
             platNumber: "B 7666 PAA",
             operationalHour: "06.00 - 21.00"
+//            colorName: "
         ),
         Bus(
             id: "bus_002",
