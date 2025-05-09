@@ -366,7 +366,7 @@ extension Route {
                 "ICE 6 BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL",
                 "VANYA PARK BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL"
             ],
-            colorName: "red"
+            colorName: "orange"
         ),
         
         Route(

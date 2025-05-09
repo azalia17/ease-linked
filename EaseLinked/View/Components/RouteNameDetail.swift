@@ -60,6 +60,6 @@ struct SingleRouteNameDetail: View {
 }
 
 #Preview {
-    RouteNameDetail(routes: [Route.all[0], Route.all[1]])
+    RouteNameDetail(routes: Route.all)
     RouteNameDetail(routes: [Route.all[3]])
 }
