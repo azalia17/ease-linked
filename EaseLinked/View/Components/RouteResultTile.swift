@@ -13,7 +13,7 @@ struct RouteResultTile: View {
     let bestEta: Bool
     let bestStop: Bool
     let routes: [Route]
-    let transitAt: String = ""
+    var transitAt: String = ""
     
     var body: some View {
         HStack(alignment: bestEta || bestStop ? .top : .center, spacing: 14) {
@@ -34,11 +34,13 @@ struct RouteResultTile: View {
                 
                 RouteName(routes: routes)
                 
-                if !transitAt.isEmpty {
-                    RouteSmallDetailChip(icon: "arrow.trianglehead.branch", text: "Transit at \(transitAt)")
+                VStack(alignment: .leading, spacing: 4){
+                    if !transitAt.isEmpty {
+                        RouteSmallDetailChip(icon: "arrow.trianglehead.branch", text: "Transit at \(transitAt)")
+                    }
+                    
+                    RouteSmallDetail(walkingDistance: 1, estimatedTravelTime: 40)
                 }
-                
-                RouteSmallDetail(walkingDistance: 1, estimatedTravelTime: 40)
             }
         }
         .padding(.horizontal, 16)
@@ -47,8 +49,8 @@ struct RouteResultTile: View {
 }
 
 #Preview {
-    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: true, bestStop: false, routes: [Route.all[1], Route.all[4]])
-    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: false, routes: [Route.all[0], Route.all[5]])
-    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: true, routes: [Route.all[0], Route.all[1]])
+    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: true, bestStop: false, routes: [Route.all[1], Route.all[4]], transitAt: "The Breeze")
+    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: false, routes: [Route.all[0], Route.all[5]], transitAt: "CBD Timur")
+    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: true, routes: [Route.all[0], Route.all[1]], transitAt: "Lobby House of Tiktokers")
     RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: true, routes: [Route.all[0]])
 }
