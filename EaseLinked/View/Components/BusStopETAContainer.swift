@@ -31,7 +31,7 @@ private struct EtaChip: View {
                 .font(.caption2)
                 .foregroundColor(.white)
             if bestEta {
-                VStack(spacing: 0) {
+                VStack(spacing: 2) {
                     Text("\(eta)")
                         .font(.largeTitle)
                         .fontWeight(.bold)
@@ -44,6 +44,7 @@ private struct EtaChip: View {
                 HStack(alignment: .bottom, spacing: 2) {
                     Text("\(eta)")
                         .font(.body)
+                        .fontWeight(.bold)
                         .foregroundColor(.white)
                     
                         Text("min")
@@ -54,9 +55,10 @@ private struct EtaChip: View {
             
                 
         }
-        .frame(width: 77)
+//        .frame(width: 60)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
+        .frame(width: 77)
         .background(.blue)
         .cornerRadius(8, corners: [.bottomLeft, .bottomRight])
     }
@@ -68,7 +70,7 @@ private struct TotalRouteChip: View {
     let bestTotalStop: Bool
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 2) {
             if bestTotalStop {
                 Text("\(total)")
                     .font(.largeTitle)
@@ -77,6 +79,7 @@ private struct TotalRouteChip: View {
                 
             } else {
                 Text("\(total)")
+                    .fontWeight(.bold)
                         .font(.body)
                         .foregroundColor(.white)
                     
@@ -88,9 +91,10 @@ private struct TotalRouteChip: View {
             
                 
         }
-        .frame(width: 77)
+//        .frame(width: 60)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
+        .frame(width: 77)
         .background(.blue)
         .cornerRadius(8, corners: [.topLeft, .topRight])
     }

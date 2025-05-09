@@ -24,7 +24,8 @@ struct RouteName: View {
                             .padding(.leading, 13)
                     }
                 }
-            }.frame(maxWidth: .infinity)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         } else {
             SingleRouteName(routeNumber: routes[0].routeNumber, routeName: routes[0].name, routeColor: routes[0].color)
         }
