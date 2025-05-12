@@ -10,37 +10,63 @@ import SwiftUI
 struct BusStopInBetween: View {
     let color: Color
     let busStops: [BusStop]
+    @State private var isExpanded = true
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0){
-            ForEach(busStops) { stop in
-                HStack(spacing: 4) {
-                    VStack(alignment: .leading, spacing: 0){
-                        SolidLine(height: 15, color: color)
-                            .padding(.horizontal, 7)
-                        Image(systemName: "h.circle.fill")
-                            .resizable()
-                            .frame(width: 14, height: 14)
-                            .foregroundStyle(color)
-                            .offset(y: -1)
-                        SolidLine(height: 15, color: color)
-                            .padding(.horizontal, 7)
-                            .offset(y: -2)
-                            .overlay {
+        HStack{
+            VStack(spacing: 0){
+                SolidLine(height: 45, color: color)
+                if isExpanded {
+                    ForEach(busStops) { stop in
+                            VStack(alignment: .leading, spacing: 0){
                                 SolidLine(height: 15, color: color)
                                     .padding(.horizontal, 7)
+                                Image(systemName: "h.circle.fill")
+                                    .resizable()
+                                    .frame(width: 14, height: 14)
+                                    .foregroundStyle(color)
+                                    .offset(y: -1)
+                                SolidLine(height: 15, color: color)
+                                    .padding(.horizontal, 7)
+                                    .offset(y: -2)
+                                    .overlay {
+                                        SolidLine(height: 15, color: color)
+                                            .padding(.horizontal, 7)
+                                    }
                             }
                     }
-                    HStack(spacing: 14) {
-                        ImageStack(isSmall: true, images: stop.images)
-                        Text(stop.name)
-                            .font(.callout)
-                    }
+                }
+                if isExpanded {
+                    SolidLine(height: 6, color: color)
 
                 }
             }
+            VStack(alignment: .leading) {
+                Divider()
+                DisclosureGroup(
+                    isExpanded: $isExpanded
+                ) {
+                    VStack() {
+                        ForEach(busStops) { stop in
+                            HStack(spacing: 14) {
+                                ImageStack(isSmall: true, images: stop.images)
+                                Text(stop.name)
+                                    .font(.callout)
+                                Spacer()
+                            }
+                            .background(.green)
+                            .padding(.vertical, 3)
+                        }
+                    }
+                    .padding(.top)
+                } label: {
+                    Text("\(busStops.count) Bus Stop(s)")
+                        .font(.footnote)
+                        .foregroundStyle(.black)
+                }
+                Divider()
+            }
         }
-        .frame(width: .infinity)
     }
 }
 
