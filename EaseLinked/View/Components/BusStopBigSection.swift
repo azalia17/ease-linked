@@ -85,7 +85,8 @@ struct BusStopBigSection<ExpandedContent: View>: View {
                         busStopName: busStop.name,
                         earliestTime: "08:10",
                         secondEarliestTime: "08:50",
-                        isTransit: transitStop
+                        isTransit: transitStop,
+                        isExpanded: $isExpanded
                     )
                 }
             } else {
@@ -103,6 +104,8 @@ struct DisclosureLabelBusStop : View {
     let secondEarliestTime: String
     let isTransit: Bool
     
+    @Binding var isExpanded: Bool
+    
     var body: some View {
         VStack(alignment: .leading) {
             if isTransit {
@@ -113,15 +116,17 @@ struct DisclosureLabelBusStop : View {
             }
             HStack(spacing: 20) {
                 BusStopImageName(images: images, busStopName: busStopName)
-                VStack(alignment: .trailing) {
-                    Text(earliestTime)
-                        .font(.title)
-                        .foregroundStyle(.black)
-                        .bold(true)
-                    Text(secondEarliestTime)
-                        .font(.body)
-                        .foregroundStyle(.black)
-                        
+                if !isExpanded {
+                    VStack(alignment: .trailing) {
+                        Text(earliestTime)
+                            .font(.title)
+                            .foregroundStyle(.black)
+                            .bold(true)
+                        Text(secondEarliestTime)
+                            .font(.body)
+                            .foregroundStyle(.black)
+                            
+                    }
                 }
             }
         }
