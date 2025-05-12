@@ -8,14 +8,16 @@
 import SwiftUI
 
 struct DottedLine: View {
+    var height: CGFloat = 40
+    
     var body: some View {
         Path { path in
             path.move(to: CGPoint(x: 0, y: 0))
-            path.addLine(to: CGPoint(x: 0, y: 40)) // Change 300 to desired width
+            path.addLine(to: CGPoint(x: 0, y: height)) 
         }
-        .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, dash: [1, 12])) // [dotLength, gapLength]
+        .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, dash: [1, 12]))
         .foregroundColor(Color(.systemGray3))
-        .frame(height: 40)
+        .frame(width: 4, height: height)
     }
 }
 

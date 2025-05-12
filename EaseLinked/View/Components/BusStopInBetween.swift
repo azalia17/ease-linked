@@ -10,7 +10,7 @@ import SwiftUI
 struct BusStopInBetween: View {
     let color: Color
     let busStops: [BusStop]
-    @State private var isExpanded = true
+    @State private var isExpanded = false
     
     var body: some View {
         HStack{
@@ -54,7 +54,6 @@ struct BusStopInBetween: View {
                                     .font(.callout)
                                 Spacer()
                             }
-                            .background(.green)
                             .padding(.vertical, 3)
                         }
                     }

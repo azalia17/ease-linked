@@ -163,3 +163,9 @@ struct ExpandableContentType<ExpandedContent: View>: View {
         }
     }
 }
+
+#Preview {
+    BusStopDisclosureClose(route: Route.all[0], busStop: BusStop.all[0], fromHour: 7, fromMinute: 7, scheduleIndex: 2, isFirstItem: true, isLastItem: false, contentExpanded: {
+        Text("a")
+    })
+}
