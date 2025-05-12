@@ -24,6 +24,7 @@ struct ScheduleTime: Identifiable, Codable {
     var id = UUID()
     let time: Date
     var isRegular: Bool = true
+    var isPassed: Bool = false
 }
 
 extension Schedule {
