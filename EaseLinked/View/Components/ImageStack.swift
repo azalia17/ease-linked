@@ -11,7 +11,9 @@ import SwiftUI
 
 struct ImageStack: View {
     
+    var isSmall: Bool = false
     @State private var isFullScreen: Bool = false
+    
     
     var images: [String] = []
     
@@ -21,36 +23,29 @@ struct ImageStack: View {
                 if(images.count > 1) {
                     Image(images[1])
                         .resizable()
-                        .frame(width: 72, height: 72)
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                        .offset(x: 8, y: 8)
+                        .frame(width: isSmall ? 30 : 72, height: isSmall ? 30 : 72)
+                        .clipShape(RoundedRectangle(cornerRadius: isSmall ? 6 : 8, style: .continuous))
+                        .offset(x: isSmall ? 4 : 8, y: isSmall ? 4 : 8)
                 }
-//                else {
-//                    Image(systemName: "photo")
-//                        .resizable()
-//                        .padding(12)
-//                        .frame(width: 72, height: 72, alignment: .center)
-//                        .foregroundColor(.white.opacity(0.7))
-//                        .background(LinearGradient(gradient: Gradient(colors: [Color.gray.opacity(0.1), Color.gray.opacity(0.3)]), startPoint: .top, endPoint: .bottom))
-//                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-//                        .offset(x: 8, y: 8)
-//                }
                 Image(images[0])
                     .resizable()
-                    .frame(width: 72, height: 72)
-                    .border(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-//                    .shadow(color: Color.black.opacity(0.2), radius: 4, x: 7, y: 8)
+                    .frame(width: isSmall ? 30 : 72, height: isSmall ? 30 : 72)
+                    .clipShape(RoundedRectangle(cornerRadius: isSmall ? 6 : 8, style: .continuous))
+                    .overlay(
+                            RoundedRectangle(cornerRadius: isSmall ? 6 : 8, style: .continuous)
+                                .stroke(.white, lineWidth: 1)
+                        )
+
             }
             else {
                 Image(systemName: "photo")
                     .resizable()
                     .padding(12)
-                    .frame(width: 72, height: 72, alignment: .center)
+                    .frame(width: isSmall ? 30 : 72, height: isSmall ? 30 : 72, alignment: .center)
                     .foregroundColor(.white.opacity(0.7))
                     .background(LinearGradient(gradient: Gradient(colors: [Color.gray.opacity(0.1), Color.gray.opacity(0.3)]), startPoint: .top, endPoint: .bottom))
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    .offset(x: 8, y: 8)
+                    .clipShape(RoundedRectangle(cornerRadius: isSmall ? 6 : 8, style: .continuous))
+                    .offset(x: isSmall ? 4 : 8, y: isSmall ? 4 : 8)
             }
         }
         .onTapGesture {
@@ -67,8 +62,15 @@ struct ImageStack: View {
 #Preview {
     ImageStack(
         images: ["Intermoda_1"
-//                ,
-//            "Intermoda_2"
+                ,
+            "Intermoda_2"
+                 ]
+    )
+    ImageStack(
+        isSmall: true,
+        images: ["Intermoda_1"
+                ,
+            "Intermoda_2"
                  ]
     )
 }
