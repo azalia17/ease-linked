@@ -17,7 +17,7 @@ struct EstimatedTimeIcon: View {
                 .resizable()
                 .foregroundStyle(.primary)
                 
-                .frame(width: 16, height: 16)
+                .frame(width: icon == "figure.walk" ? 11 : 12, height: icon == "figure.walk" ? 17 : 12)
                 .padding([.bottom, .trailing], time > 99 ? 12 : 11)
             Text("\(time)")
                 .font(.caption2)
