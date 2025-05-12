@@ -8,14 +8,25 @@
 import SwiftUI
 
 struct ScheduleGrid: View {
-    var schedules: [ScheduleTime]
+    let schedules: [ScheduleTime]
+    var isRoute7 : Bool = false
     
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 61), spacing: 2)], alignment: .leading, spacing: 8, content: {
-            ForEach(schedules) { schedule in
-                ScheduleItem(time: formatTime(from: schedule.time), isRegular: schedule.isRegular, isPassed: schedule.isPassed)
+        VStack(alignment: .leading) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 61), spacing: 2)], alignment: .leading, spacing: 8, content: {
+                ForEach(schedules) { schedule in
+                    ScheduleItem(time: formatTime(from: schedule.time), isRegular: schedule.isRegular, isPassed: schedule.isPassed)
+                }
+            })
+            
+            if !isRoute7 {
+                Text("*Weekend and national holidays only")
+                    .font(.footnote)
+                    .bold(true)
+                    .foregroundStyle(Color(.red))
+                    .padding(.top, 12)
             }
-        })
+        }
     }
 }
 

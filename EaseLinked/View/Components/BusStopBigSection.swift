@@ -22,11 +22,13 @@ struct BusStopBigSection<ExpandedContent: View>: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 0){
+                let height = expandedHeight/2 - 10
+                
                 if startStop {
-                    DottedLine(height: isExpanded ? 76 - expandedHeight : 54)
+                    DottedLine(height: isExpanded ? height : 54)
                         .padding(.leading, 12)
                 } else if transitStop {
-                    SolidLine(height: isExpanded ? 76 - expandedHeight:  54, color: transitStop ? previousRouteColor : route.color)
+                    SolidLine(height: isExpanded ? height :  54, color: transitStop ? previousRouteColor : route.color)
                         .offset(y: 1)
                         .padding(.leading, 12)
                 } else {
@@ -58,6 +60,7 @@ struct BusStopBigSection<ExpandedContent: View>: View {
                     GeometryReader { geometry in
                         VStack {
                             contentExpanded()
+                                .padding(.top, 20)
                                 .background(GeometryReader { innerGeo in
                                     Color.clear
                                         .onAppear {
@@ -65,12 +68,13 @@ struct BusStopBigSection<ExpandedContent: View>: View {
                                         }
                                 })
                                 .padding(.leading)
+                                .opacity(isExpanded ? 1 : 0)
                         }
                     }
                     .frame(height: expandedHeight)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                        withAnimation() {
                             isExpanded.toggle()
                         }
                     }
@@ -143,11 +147,55 @@ struct BusStopImageName: View {
 
 #Preview {
     BusStopBigSection(route: Route.all[3], busStop: BusStop.all[0], scheduleIndex: 1, startStop: true, transitStop: false) {
-        Text("Hello")
+        ScheduleGrid(
+            schedules: [
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+            ],
+            isRoute7: true
+        )
+        
     }
     
     BusStopBigSection(route: Route.all[6], busStop: BusStop.all[5], scheduleIndex: 1, startStop: false, transitStop: true, previousRouteColor: Route.all[3].color) {
-        Text("Hello")
+        ScheduleGrid(
+            schedules: [
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15)),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
+            ]
+        )
     }
     
     BusStopBigSection(route: Route.all[1], busStop: BusStop.all[72], scheduleIndex: 1, startStop: false, transitStop: false) {
