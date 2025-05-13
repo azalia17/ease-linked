@@ -17,7 +17,7 @@ struct TabBar: View {
                 Label("Discover", systemImage: "map")
             }
             
-            Text("Route List")
+            RouteListView()
                 .tabItem {
                     Label("Route List", systemImage: "list.bullet")
                 }

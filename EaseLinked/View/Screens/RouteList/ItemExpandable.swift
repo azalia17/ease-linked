@@ -1,13 +1,16 @@
 //
-//  BusStopDisclosureClose.swift
-//  EaseLinked
+//  ItemExpandable.swift
+//  BSDLink
 //
-//  Created by Azalia Amanda on 09/05/25.
+//  Created by Azalia Amanda on 02/04/25.
 //
+//
+
+/** Complete **/
 
 import SwiftUI
 
-struct BusStopDisclosureClose<ExpandedContent: View>: View {
+struct ItemExpandable<ExpandedContent: View>: View {
     let route: Route
     let busStop: BusStop
     let fromHour: Int
@@ -123,10 +126,15 @@ struct ExpandableContentType<ExpandedContent: View>: View {
                     }
                     
                     if isShowPreviewSchedule && !isExpanded{
-                        let sched = Schedule.getScheduleBusStopBasedWithTime(route: route, busStopId: busStop.id, index: scheduleIndex, fromHour: fromHour, fromMinute: fromMinute)
-//                        let previewSchedule : [ScheduleTime] = if sched.isEmpty {[]} else {[sched[0], sched[1]]}
-                        // MARK: TODO schedule grid
+                        let sched = Schedule.getScheduleBusStopBasedWithTime(route: route, busStopId: busStop.id, index: 1, fromHour: fromHour, fromMinute: fromMinute)
+                        let previewSchedule : [ScheduleTime] = if sched.isEmpty {[]} else {[sched[0], sched[1]]}
                         
+                        ScheduleGrids(
+                            schedules: previewSchedule,
+                            isMore: true,
+                            spacing: 1
+                        )
+                        .padding(.top)
                     }
                 }
                 .contentShape(Rectangle())
@@ -163,9 +171,24 @@ struct ExpandableContentType<ExpandedContent: View>: View {
         }
     }
 }
-
-#Preview {
-    BusStopDisclosureClose(route: Route.all[0], busStop: BusStop.all[0], fromHour: 7, fromMinute: 7, scheduleIndex: 2, isFirstItem: true, isLastItem: false, contentExpanded: {
-        Text("a")
-    })
-}
+//
+//#Preview {
+//    VStack(spacing: 0){
+//        ForEach(0..<3){ index in
+//            ItemExpandable(route: Route.all[0], busStop: BusStop.getSingleStop(by: "intermoda"), fromHour: 6, fromMinute: 0, scheduleIndex: 14, isFirstItem: false, isLastItem: false) {
+//                Text("Expanded Content\nMore lines\nAnother line")
+//                    .padding(.top)
+//            }
+//        }
+//    }
+//    
+//    ItemExpandable(route: Route.all[0], busStop: BusStop.getSingleStop(by: "intermoda"), fromHour: 10, fromMinute: 0, scheduleIndex: 1, isFirstItem: true, isLastItem: false) {
+//        Text("Expanded Content\nMore lines\nAnother line")
+//            .padding(.top)
+//    }
+//    
+//    ItemExpandable(route: Route.all[0], busStop: BusStop.getSingleStop(by: "intermoda"), fromHour: 10, fromMinute: 0, scheduleIndex: 1, isFirstItem: true, isLastItem: false, contentExpanded:  {
+//        Text("Expanded Content\nMore lines\nAnother line")
+//            .padding(.top)
+//    }, isShowPreviewSchedule: false)
+//}
