@@ -43,7 +43,7 @@ private struct InBetweenJourneyIcon: View {
         Image(systemName: "chevron.right")
             .resizable()
             .frame(width: 9, height: 13)
-            .foregroundStyle(.gray.opacity(0.5))
+            .foregroundStyle(Color(.systemGray3))
             .fontWeight(.bold)
     }
 }

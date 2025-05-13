@@ -54,6 +54,8 @@ struct SingleRouteName: View {
             Text(routeName)
                 .font(.footnote)
                 .lineLimit(1)
+            
+            Spacer()
         }
     }
 }

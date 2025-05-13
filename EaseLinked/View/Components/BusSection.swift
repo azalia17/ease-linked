@@ -36,7 +36,7 @@ struct BusSection: View {
                                     .foregroundColor(.gray)
                                     .padding([.leading, .trailing], 10)
                                     .padding([.top, .bottom], 4)
-                                    .background(.gray.opacity(0.15))
+                                    .background(Color(.systemGray6))
                                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                                 if bus.isElectric {
                                     Image(systemName: "bolt.fill")
@@ -66,7 +66,7 @@ struct BusSection: View {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    .stroke(Color(.systemGray4), lineWidth: 1)
             )
     }
 }

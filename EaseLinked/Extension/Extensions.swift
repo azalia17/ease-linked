@@ -9,6 +9,7 @@ import Foundation
 import MapKit
 import SwiftUI
 import CoreLocation
+import UIKit
 
 extension CLLocationCoordinate2D {
     static let istiqlal = CLLocationCoordinate2D(latitude: -6.170166, longitude: 106.831375)
@@ -229,6 +230,57 @@ extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
         clipShape(RoundedCorner(radius: radius, corners: corners))
     }
+    
+    @ViewBuilder
+    func bottomMaskForSheet(mask: Bool = true, _ height: CGFloat = 49) -> some View {
+        self
+            .background(SheetRootViewFinder(mask: mask, height: height))
+    }
+}
+
+fileprivate struct SheetRootViewFinder: UIViewRepresentable {
+    var mask: Bool
+    var height: CGFloat
+    
+    func makeUIView(context: Context) -> some UIView {
+        return .init()
+    }
+    
+    func updateUIView(_ uiView: UIViewType, context: Context) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            if let rootView = uiView.viewBeforeWindow, let window = rootView.window {
+                let safeArea = window.safeAreaInsets
+                
+                rootView.frame = .init(origin: .zero, size: .init(width: window.frame.width, height: window.frame.height - (mask ? (height + safeArea.bottom) : 0)))
+                
+                rootView.clipsToBounds = true
+                
+                for view in rootView.subviews {
+                    view.layer.shadowColor = UIColor.clear.cgColor
+                    
+                    if view.layer.animationKeys() != nil {
+                        if let cornerRadiusView = view.allSubViews.first(where: { $0.layer.animationKeys()?.contains("cornerRadius") ?? false }) {
+                            cornerRadiusView.layer.maskedCorners = []
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fileprivate extension UIView {
+    var viewBeforeWindow: UIView? {
+        if let superview, superview is UIWindow {
+            return self
+        }
+        
+        return superview?.viewBeforeWindow
+    }
+    
+    var allSubViews: [UIView] {
+        return subviews.flatMap { [$0] + $0.subviews }
+    }
 }
 
 struct RoundedCorner: Shape {
@@ -271,3 +323,5 @@ extension Color {
         }
     }
 }
+
+

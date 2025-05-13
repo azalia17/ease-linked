@@ -17,7 +17,8 @@ struct SearchCardMinimize: View {
             HStack{
                 Image(systemName: "chevron.backward")
                     .resizable()
-                    .frame(width: 13, height: 22)
+                    .bold(true)
+                    .frame(width: 8, height: 15)
                     .foregroundStyle(.black)
                     .padding(.trailing, 12)
                 Text(from)
@@ -37,7 +38,7 @@ struct SearchCardMinimize: View {
             )
             .shadow(color: Color.black.opacity(0.3), radius: 15, x: 0, y: 10)
         }
-        .background()
+//        .background()
     }
 }
 

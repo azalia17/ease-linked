@@ -9,10 +9,13 @@ import SwiftUI
 
 struct TabBar: View {
     var body: some View {
-        TabView { Text("Discover View").tabItem {
-                    Label("Discover", systemImage: "map")
-                }
-//                .environmentObject(locationViewModel)
+        TabView {
+            DiscoverView(
+                discoverViewModel: DiscoverViewModel()
+            )
+            .tabItem {
+                Label("Discover", systemImage: "map")
+            }
             
             Text("Route List")
                 .tabItem {

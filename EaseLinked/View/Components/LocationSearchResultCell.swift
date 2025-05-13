@@ -14,7 +14,7 @@ struct LocationSearchResultCell: View {
     
     var body: some View {
         HStack {
-            Image(systemName: isStartLocation ? "mappin" : "flag.pattern.checkered")
+            Image(systemName: isStartLocation ? "mappin.circle.fill" : "flag.pattern.checkered.circle.fill")
                 .resizable()
                 .foregroundColor(.blue)
                 .accentColor(.white)
@@ -36,7 +36,8 @@ struct LocationSearchResultCell: View {
         .padding(.leading)
     }
 }
-//
-//#Preview {
-//    LocationSearchResultCell(title: "title", subtitle: "subtitle")
-//}
+
+#Preview {
+    LocationSearchResultCell(title: "title", subtitle: "subtitle", isStartLocation: true)
+    LocationSearchResultCell(title: "title", subtitle: "subtitle", isStartLocation: false)
+}

@@ -12,14 +12,14 @@ import SwiftUI
 struct SearchCard: View {
     
     var searchHandler: () -> Void
-    var filterHandler: () -> Void
+//    var filterHandler: () -> Void
     var swapHandler: () -> Void
     var resetResultsCompletion: () -> Void
     
     @Binding var startingPoint : String
     @Binding var destinationPoint : String
     @Binding var activeTextField : String
-    @Binding var isTimePicked : Bool
+//    @Binding var isTimePicked : Bool
     @Binding var showSearchLocationView : Bool
     var action: () -> Void
     
@@ -48,7 +48,12 @@ struct SearchCard: View {
                         Spacer()
                             TextField("Search Location", text: $startingPoint)
                                 .focused($focusedField, equals: .from)
-                                .modifier(TextFieldGrayBackgroundColor(showClearButton: startingPoint != "", onClear: {startingPoint.removeAll()}))
+                                .modifier(
+                                    TextFieldGrayBackgroundColor(
+                                        showClearButton: startingPoint != "",
+                                        onClear: { startingPoint.removeAll() }
+                                    )
+                                )
                                 .padding(.top)
                                 .onChange(of: startingPoint) { oldValue, newValue in
                                     activeTextField = "from"
@@ -160,9 +165,9 @@ struct TextFieldGrayBackgroundColor: ViewModifier {
 }
 
 #Preview {
-    @Previewable @State var text = "yyy"
-    @Previewable @State var text2 = ""
-    @Previewable @State var yyy: Bool = false
-    
-    SearchCard(searchHandler: {}, filterHandler: {}, swapHandler: {}, resetResultsCompletion: {}, startingPoint: $text, destinationPoint: $text2, activeTextField: $text, isTimePicked: $yyy, showSearchLocationView: $yyy, action: {})
+//    @Previewable @State var text = "yyy"
+//    @Previewable @State var text2 = ""
+//    @Previewable @State var yyy: Bool = false
+//    
+//    SearchCard(searchHandler: {}, swapHandler: {}, resetResultsCompletion: {}, startingPoint: $text, destinationPoint: $text2, activeTextField: $text, isTimePicked: $yyy, showSearchLocationView: $yyy, action: {})
 }
