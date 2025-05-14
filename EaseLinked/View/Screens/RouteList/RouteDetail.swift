@@ -109,8 +109,3 @@ struct ScheduleExpandableForDetailRoute: View {
         )
     }
 }
-
-//#Preview {
-//    @Previewable @State var show : Bool = false
-//    RouteDetail(route: Route.all[0])
-//}

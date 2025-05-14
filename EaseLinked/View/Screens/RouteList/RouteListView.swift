@@ -20,8 +20,8 @@ struct RouteListView: View {
             return Route.all.filter {
                 $0.busStops.contains(searchTerm)
             }
-            }
         }
+    }
     
     public var filteredBusStop: [BusStop] {
         if searchTerm.isEmpty {
@@ -30,9 +30,9 @@ struct RouteListView: View {
             return BusStop.all.filter {
                 $0.id.description.localizedLowercase.contains(searchTerm)
             }
-            }
         }
-//    }
+    }
+    //    }
     
     var body: some View {
         NavigationStack {
@@ -92,82 +92,14 @@ struct RouteListView: View {
                         } label : {
                             RouteTile(routeName: route.name, stops: route.busStops.count)
                         }
-                        //                        .cornerRadius(15)
                     }
                     .listStyle(PlainListStyle())
                     .padding(.horizontal)
-                    
-                    
-                    
-                    
                 }
-                
-//                VStack() {
-//                    //Logic buat nampilin berapa route yang keliatan
-//                    RouteCount(count: filteredRoutes.count)
-//                        .safeAreaPadding(.horizontal)
-//
-//                    //Logic buat one time search info
-//                    if showOneTimeSearchInfo {
-//                        ZStack (alignment: .topTrailing){
-//                            Text("Try searching the name of a bus stop to know which routes pass by it.")
-//                                .padding(.trailing, 20)
-//                                .padding()
-//                                .multilineTextAlignment(.leading)
-//                                .foregroundStyle(.black.opacity(0.7))
-//
-//
-//                            Button(action: {
-//                                showOneTimeSearchInfo = false
-//                            }) {
-//                                Image(systemName: "xmark")
-//                                    .font(.system(size: 14))
-//                                    .padding([.top, .trailing])
-//                            }
-//                            .foregroundStyle(.black.opacity(0.5))
-//
-//                        }
-//                        .background(Color(.systemGray6))
-//                        .cornerRadius(12)
-//                        //                    .safeAreaPadding(.horizontal)
-//
-//                    }
-//
-//                    //Buat nampilin list rute yang disearch
-//                    List(filteredRoutes) { route in
-//                        NavigationLink {
-//                            DetailRouteView(route: route)
-//                        } label : {
-//                            RouteTile(routeName: route.name, stops: route.busStops.count)
-//                        }
-//                        //                        .cornerRadius(15)
-//                    }
-//                    .listStyle(PlainListStyle())
-//                    .padding(.horizontal)
-//
-//                    .navigationTitle(Text("All Routes"))
-////
-////                    //Buat nampilin search info
-////                    .toolbar {
-////                        ToolbarItem(placement: .navigationBarTrailing) {
-////                            Button(action: {
-////                                showSearchInfo = true
-////                            }) {
-////                                Image(systemName: "info.circle")
-////                            }
-////                        }
-////                    }
-////                    .sheet(isPresented: $showSearchInfo) {
-////                        SearchRoutesInfo(isShow: $showSearchInfo)
-////                            .presentationDetents([.fraction(0.2)])
-////                    }
-////
-////
-//                }
             }
-                
             
-                
+            
+            
         }
         .navigationTitle(Text("All Routes"))
         
@@ -194,11 +126,5 @@ struct RouteListView: View {
             showRoute = true
         }
     }
-
+    
 }
-
-
-//#Preview {
-//    RouteListView()
-//}
-

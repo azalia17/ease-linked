@@ -9,17 +9,13 @@ import SwiftUI
 
 struct LocationSearchView: View {
 
-//    @Binding var isTimePicked : Bool
     @Binding var showSearchLocationView : Bool
     @Binding var isSearch: Bool
     
     @StateObject var discoverViewModel : DiscoverViewModel
     
-    @State var activeTextField: String = ""
     @State private var showTimePicker: Bool = false
     @State private var timePicked = Date()
-    
-//    @EnvironmentObject var locationViewModel : LocationSearchViewModel
     
     var searchAction: () -> Void
     
@@ -28,8 +24,7 @@ struct LocationSearchView: View {
             VStack(alignment: .leading) {
                 Button(action: {
                     withAnimation(.spring){
-                        showSearchLocationView.toggle()
-//                        locationViewModel.resetAll()
+                        discoverViewModel.updateViewState(.initial)
                     }
                 }) {
                     HStack {
@@ -42,49 +37,75 @@ struct LocationSearchView: View {
                     searchHandler: {
                         discoverViewModel.search()
                     },
-                    swapHandler: {},
-                    resetResultsCompletion: {/*locationViewModel.resetResultsCompletion()*/},
-                    startingPoint: $discoverViewModel.startingPoint,
-                    destinationPoint: $discoverViewModel.destinationPoint,
-                    activeTextField: $activeTextField,
-                    showSearchLocationView: $showSearchLocationView
+                    swapHandler: {
+                        discoverViewModel.swapDestination(
+                            start: discoverViewModel.endLocationSearch,
+                            end: discoverViewModel.startLocationSearch
+                        )
+                    },
+                    resetResultsCompletion: {
+                        discoverViewModel.resetResultsCompletion()
+                    },
+                    startingPoint: $discoverViewModel.startLocationQueryFragment,
+                    destinationPoint: $discoverViewModel.endLocationQueryFragment,
+                    activeTextField: $discoverViewModel.activeTextField,
+                    viewState: $discoverViewModel.viewState
                 ) {}
             }
             .frame(height: 140)
             .padding()
             .background(.gray.opacity(0.2))
             
-            ScrollView {
+            if !discoverViewModel.results.isEmpty {
+                ListOfLocation(discoverViewModel: discoverViewModel)
+            } else {
                 VStack(alignment: .leading, spacing: 0) {
-//                    ForEach(locationViewModel.results, id: \.self) { result in
-                    ForEach(0..<10, id: \.self) { result in
-                        LocationSearchResultCell(
-                            title: "result.title",
-                            subtitle: "result.subtitle",
-                            isStartLocation: false
-                        ).onTapGesture {
-//                            locationViewModel.selectLocation(result, textField: activeTextField)
+                    HStack {
+                        Image(systemName: "location.circle.fill")
+                            .resizable()
+                            .foregroundColor(.blue)
+                            .accentColor(.white)
+                            .frame(width: 40, height: 40)
+                        
+                        VStack(alignment: .leading) {
+                            Text("Your Location")
+                                .font(.body)
+                                .bold()
                         }
+                        .padding(.leading, 8)
+                        .padding(.vertical, 8)
                     }
+                    .padding()
+                    Rectangle()
+                        .frame(height: 4)  // Set the height (thickness) of the divider
+                        .foregroundStyle(Color(.systemGray5))
+                        .background(Color(.systemGray5))
+                    Spacer()
                 }
-                .padding(.bottom, 70)
+                .background(.white)
             }
         }
         .background(.white)
-//        .sheet(isPresented: $showTimePicker) {
-//            TimePicker(showTimePicker: $showTimePicker, timePicked: $timePicked, isTimePicked: $isTimePicked)
-//                .presentationDetents([.fraction(0.45)])
-//        }
     }
 }
 
-//#Preview {
-//    @Previewable @State var startingPoint : String = ""
-//    @Previewable @State var destinationPoint : String = ""
-//    @Previewable @State var isTimePicked : Bool = false
-//    @Previewable @State var show : Bool = false
-//    
-//    LocationSearchView(
-//        startingPoint: $startingPoint, destinationPoint: $destinationPoint, isTimePicked: $isTimePicked,showSearchLocationView: $show
-//    )
-//}
+struct ListOfLocation: View {
+    @StateObject var discoverViewModel: DiscoverViewModel
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(discoverViewModel.results, id: \.self) { result in
+                    LocationSearchResultCell(
+                        title: result.title,
+                        subtitle: result.subtitle,
+                        isStartLocation: discoverViewModel.activeTextField == "from" ? true : false
+                    ).onTapGesture {
+                        discoverViewModel.selectLocation(result, textField: discoverViewModel.activeTextField)
+                    }
+                }
+            }
+            .padding(.bottom, 70)
+        }
+    }
+}

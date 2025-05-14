@@ -6,20 +6,9 @@ struct BusStop: Identifiable, Codable {
     let name: String
     let latitude: Double
     let longitude: Double
-//    let schedule: [Schedule]
     let images: [String]
     let routes: [String]
-    //    let id: String
-    //    let name: String
-    //    let coordinates: CLLocationCoordinate2D
-    //    //    let schedule: [String]
-    //    let images: [String]
-    //    let routes: [String]
-    //    var isBigHalte: Bool = false
 }
-
-
-
 
 extension BusStop {
     

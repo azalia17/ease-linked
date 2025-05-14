@@ -171,24 +171,3 @@ struct ExpandableContentType<ExpandedContent: View>: View {
         }
     }
 }
-//
-//#Preview {
-//    VStack(spacing: 0){
-//        ForEach(0..<3){ index in
-//            ItemExpandable(route: Route.all[0], busStop: BusStop.getSingleStop(by: "intermoda"), fromHour: 6, fromMinute: 0, scheduleIndex: 14, isFirstItem: false, isLastItem: false) {
-//                Text("Expanded Content\nMore lines\nAnother line")
-//                    .padding(.top)
-//            }
-//        }
-//    }
-//    
-//    ItemExpandable(route: Route.all[0], busStop: BusStop.getSingleStop(by: "intermoda"), fromHour: 10, fromMinute: 0, scheduleIndex: 1, isFirstItem: true, isLastItem: false) {
-//        Text("Expanded Content\nMore lines\nAnother line")
-//            .padding(.top)
-//    }
-//    
-//    ItemExpandable(route: Route.all[0], busStop: BusStop.getSingleStop(by: "intermoda"), fromHour: 10, fromMinute: 0, scheduleIndex: 1, isFirstItem: true, isLastItem: false, contentExpanded:  {
-//        Text("Expanded Content\nMore lines\nAnother line")
-//            .padding(.top)
-//    }, isShowPreviewSchedule: false)
-//}

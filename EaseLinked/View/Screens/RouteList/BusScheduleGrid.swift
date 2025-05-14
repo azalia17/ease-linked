@@ -24,7 +24,6 @@ struct BusScheduleGrid: View {
                     Text(Bus.getBus(by: schedule.bus).platNumber)
                         .font(.subheadline)
                 }
-//                .padding(.top)
                 
                 ScheduleGrids(
                     schedules: ScheduleDetail.getScheduleTime(
@@ -34,14 +33,8 @@ struct BusScheduleGrid: View {
                     )
                 )
                 .padding(.bottom, 8)
-//                Divider()
-//                    .padding(.top)
             }
         }
         .padding(.top)
     }
 }
-
-//#Preview {
-//    BusScheduleGrid(busStopId: "intermoda", index: 1, busSchedules: Schedule.all)
-//}

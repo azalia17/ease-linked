@@ -32,7 +32,6 @@ struct DetailRouteView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-//                DetailSheet(route: route)
                 
                 Map(initialPosition: cameraPosition) {
                     Marker("Halte A", systemImage: "bus", coordinate: .bbb)

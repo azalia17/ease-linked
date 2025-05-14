@@ -69,8 +69,3 @@ struct BusTypeCard: View {
         ))
     }
 }
-
-
-//#Preview {
-//    BusTypeCard(busList: Bus.all)
-//}

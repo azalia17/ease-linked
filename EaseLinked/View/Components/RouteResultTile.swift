@@ -44,7 +44,6 @@ struct RouteResultTile: View {
             }
         }
         .padding(.horizontal, 16)
-        .frame(width: .infinity)
     }
 }
 

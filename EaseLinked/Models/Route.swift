@@ -24,19 +24,7 @@ extension Route {
         let route = Route.all.filter {$0.id == routeid}.first ?? Route(id: "xx", name: "xx", routeNumber: 0, busStops: [], bus: [], schedule: [], note: ["xx"], colorName: "black")
         return (route.name, route.routeNumber, route.note)
     }
-
-    // Returns the schedule for a bus stop (for simplicity, assume the bus stop is indexed)
-//    func getSchedule(for busStopID: String) -> [ScheduleDetail] {
-//        // Fetch the schedule for this bus stop from the route's schedule
-//        return self.schedule
-//            .flatMap { Schedule.getSchedules(by: [$0]) }
-//            .flatMap { ScheduleDetail.getManyScheduleDetails(by: [$0.scheduleDetail])}
-//            .flatMap { $0.scheduleDetail }
-//            .filter { $0.busStop == busStopID }
-//    }
-//    
     
-//    static.le
     static let all: [Route] = [
         Route(
             id: "route_1",
@@ -52,7 +40,6 @@ extension Route {
                 "edutown2",
                 "ice1",
                 "ice2",
-//                "iceBusinessPark",
                 "ice6",
                 "ice5",
                 "gop1",
@@ -82,7 +69,6 @@ extension Route {
                 "greenCove",
                 "theBreeze",
                 "cbdTimur1",
-//                "cbdSelatan1",
                 "aeonMall1",
                 "cbdBarat2",
                 "simplicity1",
@@ -108,7 +94,6 @@ extension Route {
                 "ICE 6 BERHENTI DAN MENUNGGU 1 MENIT ATAU MENYESUAIKAN DENGAN JADWAL"
             ],
             colorName: "green"
-//            color: Color(.green)
         ),
         
         Route(
@@ -173,7 +158,6 @@ extension Route {
                 "greenwichParkOffice"
             ],
             bus: ["bus_003", "bus_004"],
-//            schedule: ["r1_1"],
             schedule: ["r2_1", "r2_2"],
             note: [
                 "TIME TABLE SEWAKTU - WAKTU DAPAT BERUBAH MENYESUAIKAN KONDISI OPERASIONAL DAN TRAFFIC",
@@ -194,7 +178,6 @@ extension Route {
                 "edutown2",
                 "ice1",
                 "ice2",
-//                "iceBusinessPark",
                 "ice6",
                 "ice5",
                 "froogy",
@@ -271,7 +254,6 @@ extension Route {
                 "fbl1",
                 "ice1",
                 "ice2",
-//                "iceBusinessPark",
                 "ice6",
                 "ice5",
                 "cbdBarat1",
@@ -336,21 +318,15 @@ extension Route {
                 "edutown2",
                 "ice1",
                 "ice2",
-//                "iceBusinessPark",
                 "ice6",
                 "prestigia",
-//                "rukoTheLoop",
                 "theMozia1",
                 "piazziaMozia",
-//                "grandLucky1",
                 "tabebuya",
-//                "westPark",
                 "vanyaPark",
-//                "grandLucky1",
                 "theMozia2",
                 "illustria",
                 "ice2",
-//                "iceBusinessPark",
                 "ice6",
                 "ice5",
                 "cbdBarat1",

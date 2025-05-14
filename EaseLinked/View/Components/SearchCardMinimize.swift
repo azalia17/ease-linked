@@ -38,7 +38,9 @@ struct SearchCardMinimize: View {
             )
             .shadow(color: Color.black.opacity(0.3), radius: 15, x: 0, y: 10)
         }
-//        .background()
+        .onTapGesture {
+            action()
+        }
     }
 }
 

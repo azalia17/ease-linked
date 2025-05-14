@@ -111,8 +111,3 @@ struct RouteInfo: View {
     }
     
 }
-
-//#Preview {
-//        @Previewable @State var show : Bool = true
-//    RouteInfo(routes: [Route.all[0], Route.all[0]])
-//}

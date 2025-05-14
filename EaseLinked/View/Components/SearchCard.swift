@@ -12,15 +12,15 @@ import SwiftUI
 struct SearchCard: View {
     
     var searchHandler: () -> Void
-//    var filterHandler: () -> Void
     var swapHandler: () -> Void
     var resetResultsCompletion: () -> Void
     
     @Binding var startingPoint : String
     @Binding var destinationPoint : String
     @Binding var activeTextField : String
-//    @Binding var isTimePicked : Bool
-    @Binding var showSearchLocationView : Bool
+    
+    @Binding var viewState: DiscoverViewState
+    
     var action: () -> Void
     
     // Define focus states
@@ -30,6 +30,7 @@ struct SearchCard: View {
     }
     
     @FocusState private var focusedField: Field?
+
     
     var body: some View {
         HStack (alignment: .center) {
@@ -43,7 +44,7 @@ struct SearchCard: View {
                         .opacity(0.7)
                     Spacer()
                 }
-                if (showSearchLocationView) {
+                if (viewState == .search) {
                     VStack {
                         Spacer()
                             TextField("Search Location", text: $startingPoint)

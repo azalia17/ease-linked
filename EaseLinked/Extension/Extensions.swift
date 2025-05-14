@@ -217,14 +217,6 @@ extension CLLocationCoordinate2D {
         return location1.distance(from: location2) // This calls the correct distance method
     }
 }
-//
-//extension CLLocationCoordinate2D {
-//    func distance(to location: CLLocationCoordinate2D) -> CLLocationDistance {
-//        let location1 = CLLocation(latitude: self.latitude, longitude: self.longitude)
-//        let location2 = CLLocation(latitude: location.latitude, longitude: location.longitude)
-//        return location1.distance(from: location2)
-//    }
-//}
 
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
@@ -296,10 +288,6 @@ struct RoundedCorner: Shape {
         return Path(path.cgPath)
     }
 }
-
-//extension String {
-//
-//}
 
 extension Color {
     static func from(name: String) -> Color {

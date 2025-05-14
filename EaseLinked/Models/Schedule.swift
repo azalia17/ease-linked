@@ -38,34 +38,6 @@ extension Schedule {
         return schedules
     }
     
-    
-    
-//    static func getScheduleBusStopBasedWithTime(
-//        route: Route,
-//        busStopId: String,
-//        index: Int,
-//        fromHour: Int,
-//        fromMinute: Int
-//    ) -> [ScheduleTime] {
-//        let startTime = timeFrom(fromHour, fromMinute)
-//        let endTime = timeFrom(fromHour + 20, fromMinute)
-//        
-//        let matchingSchedules = Schedule.all.filter { route.schedule.contains($0.id) }
-//        
-//        let allDetailIDs = matchingSchedules.flatMap { $0.scheduleDetail }
-//        
-//        let allScheduleDetails = ScheduleDetail.getManyScheduleDetails(by: allDetailIDs)
-//        
-//        let matchingDetails =
-//        allScheduleDetails.filter { $0.busStop == busStopId && $0.index == index }
-//        
-//        let filteredTimes = matchingDetails.flatMap { detail in
-//            detail.time.filter { $0.time >= startTime && $0.time < endTime }
-//        }
-//        
-//        return filteredTimes.sorted { $0.time < $1.time }
-//    }
-    
     static func getScheduleBusStopBasedWithTime(
         route: Route,
         busStopId: String,
