@@ -158,7 +158,7 @@ struct DiscoverView: View {
                                     .foregroundStyle(Color(.systemGray))
                             })
                         .buttonStyle(.bordered)
-                        .background(Color(.systemGray3))
+                        .background(Color(.systemGray2))
                         .clipShape(Circle())
                     }
                 })
