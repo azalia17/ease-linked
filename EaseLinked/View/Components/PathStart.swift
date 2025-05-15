@@ -21,6 +21,7 @@ struct PathStart: View {
                     .frame(width: 24, height: 24)
                 Text(startLocation)
                     .font(.footnote)
+                Spacer()
             }
             DottedLine()
                 .padding(.horizontal, 12)
@@ -37,6 +38,7 @@ struct PathStart: View {
                 
                 Text("\(walkingDistance) m walking (\(walkingTime) minutes)")
                     .font(.footnote)
+                Spacer()
             }
         }
     }

@@ -14,11 +14,10 @@ struct DiscoverView: View {
     var cameraPosition: MapCameraPosition = .region(.init(center: .init(latitude: -6.305968, longitude: 106.672272), latitudinalMeters: 13000, longitudinalMeters: 13000))
     let locationManager = CLLocationManager()
     
-    @State private var selectedDetent: PresentationDetent = .height(100)
+    @State private var selectedDetent: PresentationDetent = .medium
     @Binding var isPresented: Bool
     
     @Environment(\.verticalSizeClass) private var sizeClass
-    
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -90,7 +89,7 @@ struct DiscoverView: View {
             if discoverViewModel.viewState != .search {
                 GeometryReader { geometry in
                     let heightPosition = if selectedDetent == .medium || selectedDetent == .large { geometry.size.height - 420 } else {
-                        geometry.size.height - 130
+                        geometry.size.height - 90
                     }
                     let trailingPosition = if discoverViewModel.viewState == .result || discoverViewModel.viewState == .routeDetail { geometry.size.width - 50 } else { geometry.size.width - 30 }
                     
@@ -133,38 +132,89 @@ struct DiscoverView: View {
         
         .sheet(isPresented: $isPresented) {
             NavigationStack {
+                
                 ScrollView {
-                    VStack {
-                        if discoverViewModel.viewState == .result {
-                            RoutesResult(generatedRoutes: discoverViewModel.availableRoutes)
+                    if discoverViewModel.viewState == .result {
+                        VStack {
+                            if discoverViewModel.viewState == .result {
+                                RoutesResult(
+                                    generatedRoutes: discoverViewModel.availableRoutes,
+                                    action: discoverViewModel.selectRoute
+                                )
+                            }
                         }
                     }
+                    else {
+                        
+                        RouteSelectedDetail(generatedRoutes: discoverViewModel.selectedRoutes!, estimatedTimeSpent: 10, buses: Bus.getBusses(byRoutes: discoverViewModel.selectedRoutes?.routesId ?? []), startLocation: discoverViewModel.startLocationQueryFragment, walkingTime: 10, scheduleTime: [])
+                            .padding(.horizontal)
+                        
+                    }
                 }
-                .toolbar(content: {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Text("\(discoverViewModel.availableRoutes.count) routes you can take")
-                            .font(.title3)
-                            .bold()
-                    }
-                    
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button(
-                            action: {
-                                
-                            },
-                            label : {
-                                Image(systemName: "xmark")
+                    .toolbar(content: {
+                        ToolbarItem(placement: .topBarLeading) {
+                            if discoverViewModel.viewState == .result {
+                                Text("\(discoverViewModel.availableRoutes.count) routes you can take")
+                                    .font(.title3)
                                     .bold()
-                                    .foregroundStyle(Color(.systemGray))
-                            })
-                        .buttonStyle(.bordered)
-                        .background(Color(.systemGray2))
-                        .clipShape(Circle())
+                            } else {
+                                JourneyTile(startWalkingTime: 10, startStop: discoverViewModel.selectedRoutes!.busStop[0].name, endStop: discoverViewModel.selectedRoutes!.busStop[discoverViewModel.selectedRoutes!.busStop.count - 1].name, endWalkingTime: 10)
+                            }
+                        }
+                        
+                        ToolbarItem(placement: .topBarTrailing) {
+                            HStack(spacing: 2) {
+                                if discoverViewModel.viewState == .routeDetail {
+                                    Button(
+                                        action: {
+                                            
+                                        },
+                                        label : {
+                                            Image(systemName: "plus")
+                                                .bold()
+                                                .foregroundStyle(Color(.systemGray))
+                                        })
+                                    .buttonStyle(.bordered)
+                                    .background(Color(.systemGray2))
+                                    .clipShape(Circle())
+                                    
+                                    Button(
+                                        action: {
+                                            
+                                        },
+                                        label : {
+                                            Image(systemName: "info")
+                                                .bold()
+                                                .foregroundStyle(Color(.systemGray))
+                                        })
+                                    .buttonStyle(.bordered)
+                                    .background(Color(.systemGray2))
+                                    .clipShape(Circle())
+                                }
+                                
+                                Button(
+                                    action: {
+                                        if discoverViewModel.viewState == .routeDetail {
+                                            discoverViewModel.updateViewState(.result)
+                                        } else {
+                                            discoverViewModel.updateViewState(.search)
+                                        }
+                                    },
+                                    label : {
+                                        Image(systemName: "xmark")
+                                            .bold()
+                                            .foregroundStyle(Color(.systemGray))
+                                    })
+                                .buttonStyle(.bordered)
+                                .background(Color(.systemGray2))
+                                .clipShape(Circle())
+                            }
+                        }
                     }
-                })
+                    )
             }
             
-            .presentationDetents([.height(100), .medium, .large], selection: $selectedDetent)
+            .presentationDetents([.height(60), .medium, .large], selection: $selectedDetent)
             .interactiveDismissDisabled()
             .presentationBackgroundInteraction(.enabled(upThrough: .large))
             .presentationBackground(discoverViewModel.viewState == .result ? AnyShapeStyle(.regularMaterial) : AnyShapeStyle(Color.white))

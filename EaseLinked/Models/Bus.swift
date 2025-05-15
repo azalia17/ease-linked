@@ -15,6 +15,7 @@ struct Bus: Identifiable, Codable {
     let operationalHour: String
     var isElectric: Bool = false
     let route: String
+    let routeId: String
     let colorName: String  // e.g., "red", "green"
 
     var color: Color {
@@ -24,7 +25,7 @@ struct Bus: Identifiable, Codable {
 
 extension Bus {
     static func getBus(by id: String) -> Bus {
-        return all.first(where: { $0.id == id }) ?? Bus(id: "000", code: "000", platNumber: "xx xxxx xx", operationalHour: "00.00 - 00.00", route: "R0" , colorName: "black")
+        return all.first(where: { $0.id == id }) ?? Bus(id: "000", code: "000", platNumber: "xx xxxx xx", operationalHour: "00.00 - 00.00", route: "R0" , routeId: "route_1", colorName: "black")
     }
     
     static func getBusses(by ids: [String]) -> [Bus] {
@@ -37,6 +38,18 @@ extension Bus {
         return buses
     }
     
+    static func getBusses(byRoutes ids: [String]) -> [Bus] {
+        var buses : [Bus] = []
+        
+        for id in ids {
+            buses += all.filter { $0.routeId == id}
+        }
+            
+        return buses
+    }
+    
+    
+    
     static let all: [Bus] = [
         Bus(
             id: "bus_001",
@@ -44,6 +57,7 @@ extension Bus {
             platNumber: "B 7666 PAA",
             operationalHour: "06.00 - 21.00",
             route: "R1",
+            routeId: "route_1",
             colorName: "green"
         ),
         Bus(
@@ -52,6 +66,7 @@ extension Bus {
             platNumber: "B 7966 PAA",
             operationalHour: "06.00 - 21.00",
             route: "R1",
+            routeId: "route_1",
             colorName: "green"
         ),
         Bus(
@@ -60,6 +75,7 @@ extension Bus {
             platNumber: "B 7466 PAA",
             operationalHour: "06.00 - 21.00",
             route: "R2",
+            routeId: "route_2",
             colorName: "cyan"
         ),
         Bus(
@@ -68,6 +84,7 @@ extension Bus {
             platNumber: "B 7266 JF",
             operationalHour: "06.00 - 21.00",
             route: "R2",
+            routeId: "route_2",
             colorName: "cyan"
         ),
         Bus(
@@ -76,6 +93,7 @@ extension Bus {
             platNumber: "B 7366 JE",
             operationalHour: "06.00 - 21.00",
             route: "R3",
+            routeId: "route_3",
             colorName: "indigo"
         ),
         Bus(
@@ -84,6 +102,7 @@ extension Bus {
             platNumber: "B 7166 PAA",
             operationalHour: "06.00 - 09.00",
             route: "R3",
+            routeId: "route_3",
             colorName: "indigo"
         ),
         Bus(
@@ -92,6 +111,7 @@ extension Bus {
             platNumber: "B 7366 PAA",
             operationalHour: "06.00 - 21.00",
             route: "R4",
+            routeId: "route_4",
             colorName: "purple"
         ),
         Bus(
@@ -100,6 +120,7 @@ extension Bus {
             platNumber: "B 7866 PAA",
             operationalHour: "06.00 - 09.00",
             route: "R4",
+            routeId: "route_4",
             colorName: "purple"
         ),
         Bus(
@@ -108,6 +129,7 @@ extension Bus {
             platNumber: "B 7166 PAA",
             operationalHour: "09.00 - 21.00",
             route: "R5",
+            routeId: "route_5",
             colorName: "pink"
         ),
         Bus(
@@ -116,6 +138,7 @@ extension Bus {
             platNumber: "B 7866 PAA",
             operationalHour: "09.00 - 21.00",
             route: "R5",
+            routeId: "route_5",
             colorName: "pink"
         ),
         Bus(
@@ -124,6 +147,7 @@ extension Bus {
             platNumber: "B 7766 PAA",
             operationalHour: "06.00 - 21.00",
             route: "R6",
+            routeId: "route_6",
             colorName: "orange"
         ),
         Bus(
@@ -133,6 +157,7 @@ extension Bus {
             operationalHour: "06.00 - 21.00",
             isElectric: true,
             route: "R7",
+            routeId: "route_7",
             colorName: "brown"
         ),
     ]

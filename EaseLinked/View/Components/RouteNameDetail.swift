@@ -55,6 +55,8 @@ struct SingleRouteNameDetail: View {
                 .font(.callout)
                 .fontWeight(.semibold)
                 .lineLimit(1)
+            
+            Spacer()
         }
     }
 }

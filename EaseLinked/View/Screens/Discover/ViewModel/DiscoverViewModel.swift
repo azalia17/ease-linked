@@ -68,6 +68,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     @Published var busStopsGenerated: [IdentifiableCoordinate] = []
     @Published var availableRoutes: [GeneratedRoute] = []
     
+    @Published var selectedRoutes: GeneratedRoute?
+    
     
     override init() {
         super.init()
@@ -207,25 +209,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 let endBusStop = routeDetails.endBusStop
                 let routes = routeDetails.routes
                 
-                // Generate the bus stops the user will pass through based on the first matching route
-//                if let busStopsOnRoute = self.generateBusStops(from: startBusStop, to: endBusStop, routes: routes) {
-//                    // Print out the bus stops
-//                    for busStop in busStopsOnRoute {
-//                        print("\"\(busStop.id)\",")
-//                    }
-//                    
-//                } else {
-//                    // Generate paths with possible transfers considering transit bus stops
-//                    let pathsWithTransfers = self.generatePathsWithTransfers(startBusStop: startBusStop, endBusStop: endBusStop, routes: routes)
-//                    
-//                    // Print out the possible paths
-//                    for (index, path) in pathsWithTransfers.enumerated() {
-//                        print("Path \(index + 1):")
-//                        for busStop in path {
-//                            print("  \(busStop.name)")
-//                        }
-//                    }
-//                }
                 let direct = getDirectRoutes(from: startBusStop, to: endBusStop)
 
                 let transferPaths = generatePathsWithTransfers(startBusStop: startBusStop, endBusStop: endBusStop, routes: routes)
@@ -343,66 +326,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         
         return directRoutes
     }
-
-//    func convertPathsToGeneratedRoutes(paths: [[BusStop]]) -> [GeneratedRoute] {
-//        var result: [GeneratedRoute] = []
-//        
-//        for path in paths {
-//            let involvedRoutes = path.flatMap { stop in
-//                findRoutes(for: stop)
-//            }.uniqued(by: { $0.id }) // <-- deduplicate by route.id
-//            
-//            let generated = GeneratedRoute(
-//                eta: 0,
-//                totalBusStop: path.count,
-//                bestEta: false,
-//                bestStop: false,
-//                routes: involvedRoutes,
-//                walkingDistance: 0,
-//                estimatedTimeTravel: 0,
-//                busStop: path
-//            )
-//            
-//            result.append(generated)
-//        }
-//        
-//        return result
-//    }
-
-//    func convertPathsToGeneratedRoutes(paths: [[BusStop]]) -> [GeneratedRoute] {
-//        var result: [GeneratedRoute] = []
-//        var seenBusStopSequences: Set<String> = []
-//
-//        for path in paths {
-//            let busStopIDs = path.map { $0.id }
-//            let key = busStopIDs.joined(separator: "->") // Unique key for path
-//
-//            if seenBusStopSequences.contains(key) {
-//                continue // Skip duplicate
-//            }
-//
-//            seenBusStopSequences.insert(key)
-//
-//            let involvedRoutes = path.flatMap { stop in
-//                findRoutes(for: stop)
-//            }.uniqued(by: { $0.id })
-//
-//            let generated = GeneratedRoute(
-//                eta: 0,
-//                totalBusStop: path.count,
-//                bestEta: false,
-//                bestStop: false,
-//                routes: involvedRoutes,
-//                walkingDistance: 0,
-//                estimatedTimeTravel: 0,
-//                busStop: path
-//            )
-//
-//            result.append(generated)
-//        }
-//
-//        return result
-//    }
     
     func convertPathsToGeneratedRoutes(paths: [[BusStop]]) -> [GeneratedRoute] {
         var result: [GeneratedRoute] = []
@@ -527,7 +450,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             // Check the schedule details for the interested bus stops
             for stop in interestedStops {
                 // Filter schedule details for the current stop
-                var details = schedule.scheduleDetail.filter { $0.contains(stop) }
+                let details = schedule.scheduleDetail.filter { $0.contains(stop) }
                 
                 // If there are matching details, merge them into the result
                 if !details.isEmpty {
@@ -574,26 +497,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 }
                 possiblePaths.append(busStopsOnRoute)
                 
-                // Now, check for paths with transfers
-//                for transitBusStop in transitBusStops {
-//                    // Check if the transit bus stop exists in this route
-//                    if let transferIndex = route.busStops.firstIndex(of: transitBusStop.id),
-//                       transferIndex > startIndex {
-//                        
-//                        // Split the route at the transfer point and create a path with transfer
-//                        let firstPart = Array(route.busStops[startIndex...transferIndex])
-//                        let secondPart = Array(route.busStops[transferIndex...endIndex])
-//                        
-//                        let firstPath = firstPart.compactMap { busStopID in
-//                            return BusStop.all.first { $0.id == busStopID }
-//                        }
-//                        let secondPath = secondPart.compactMap { busStopID in
-//                            return BusStop.all.first { $0.id == busStopID }
-//                        }
-//                        
-//                        possiblePaths.append(firstPath + secondPath)
-//                    }
-//                }
                 for transitBusStop in transitBusStops {
                     if let transferIndex = route.busStops.firstIndex(of: transitBusStop.id),
                        transferIndex > startIndex,
@@ -608,8 +511,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                         let secondPath = secondPart.compactMap { id in
                             BusStop.all.first { $0.id == id }
                         }
-
-//                        possiblePaths.append(firstPath + secondPath)
+                        
                         possiblePaths.append(mergeWithoutDuplicate(firstPath, secondPath))
 
                     }
@@ -620,18 +522,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         
         return possiblePaths
     }
-    
-//    func removeConsecutiveDuplicates(from stops: [BusStop]) -> [BusStop] {
-//        guard !stops.isEmpty else { return [] }
-//
-//        var result = [stops[0]]
-//        for stop in stops.dropFirst() {
-//            if stop.id != result.last?.id {
-//                result.append(stop)
-//            }
-//        }
-//        return result
-//    }
     
     func mergeWithoutDuplicate(_ first: [BusStop], _ second: [BusStop]) -> [BusStop] {
         guard let lastOfFirst = first.last,
@@ -699,7 +589,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             request.source = MKMapItem(placemark: .init(coordinate: start))
             request.destination = MKMapItem(placemark: .init(coordinate: destination))
             request.transportType = .walking
-//            requesr.calculate
             
             do {
                 let directions = try await MKDirections(request: request).calculate()
@@ -762,6 +651,11 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     
     func resetResultsCompletion() {
         self.results = [MKLocalSearchCompletion]()
+    }
+    
+    func selectRoute(generatedRoute: GeneratedRoute) {
+        selectedRoutes = generatedRoute
+        viewState = .routeDetail
     }
 }
 

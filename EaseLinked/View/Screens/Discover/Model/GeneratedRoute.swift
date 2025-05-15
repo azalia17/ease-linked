@@ -20,6 +20,10 @@ struct GeneratedRoute: Identifiable, Codable {
     let walkingDistance: Int
     let estimatedTimeTravel: Int
     let busStop: [BusStop]
+//    let transitBusStop: BusStop
+    
+    var routesId: [String] { routes.map {$0.id} }
+    
 }
 
 
