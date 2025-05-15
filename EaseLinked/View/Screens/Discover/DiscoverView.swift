@@ -106,7 +106,7 @@ struct DiscoverView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                                         .shadow(radius: 1, x: 0, y: 1)
                                 }
-                                .disabled(!discoverViewModel.availableRoutes.isEmpty)
+                                .disabled(discoverViewModel.dataState == .loaded || discoverViewModel.dataState == .loading)
                         }
                         Button(
                             action: {
@@ -134,23 +134,35 @@ struct DiscoverView: View {
             NavigationStack {
                 
                 ScrollView {
-                    if discoverViewModel.viewState == .result {
+                    switch discoverViewModel.dataState {
+                    case .loading:
                         VStack {
-                            if discoverViewModel.viewState == .result {
-                                RoutesResult(
-                                    generatedRoutes: discoverViewModel.availableRoutes,
-                                    action: discoverViewModel.selectRoute
-                                )
+                            Text("Loading...")
+                        }
+                    case .loaded:
+                        if discoverViewModel.viewState == .result {
+                            VStack {
+                                if discoverViewModel.viewState == .result {
+                                    RoutesResult(
+                                        generatedRoutes: discoverViewModel.availableRoutes,
+                                        action: discoverViewModel.selectRoute
+                                    )
+                                }
                             }
                         }
-                    }
-                    else {
-                        
-                        RouteSelectedDetail(generatedRoutes: discoverViewModel.selectedRoutes!, estimatedTimeSpent: 10, buses: Bus.getBusses(byRoutes: discoverViewModel.selectedRoutes?.routesId ?? []), startLocation: discoverViewModel.startLocationQueryFragment, walkingTime: 10, scheduleTime: [])
-                            .padding(.horizontal)
-                        
+                        else {
+                            
+                            RouteSelectedDetail(generatedRoutes: discoverViewModel.selectedRoutes!, estimatedTimeSpent: 10, buses: discoverViewModel.selectedRoutes!.busses, startLocation: discoverViewModel.startLocationQueryFragment, endLocation: discoverViewModel.endLocationQueryFragment, startWalkingTime: 10, endWalkingTime: 10, scheduleTime: [])
+                                .padding(.horizontal)
+                            
+                        }
+                    case .error(let error):
+                        VStack {
+                            Text("\(error). Please try again")
+                        }
                     }
                 }
+                
                     .toolbar(content: {
                         ToolbarItem(placement: .topBarLeading) {
                             if discoverViewModel.viewState == .result {

@@ -15,14 +15,15 @@ enum DiscoverViewState {
     case routeDetail
 }
 
-enum DiscoverDataState {
+enum DiscoverDataState: Equatable {
     case loading
     case loaded
-    case error
+    case error(String)
 }
 
 final class DiscoverViewModel : NSObject, ObservableObject {
     @Published var viewState: DiscoverViewState = .initial
+    @Published var dataState: DiscoverDataState = .loading
     
     @Published var activeTextField: String = "from"
     @Published var isTimePicked: Bool = false
@@ -95,10 +96,14 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         locationSearch(forLocalSearchCompletion: startLocationSearch) { response, error in
             if let error = error {
                 print("DEBUG: Location search failed with error \(error.localizedDescription)")
+                self.dataState = .error("DEBUG: Location search failed with error \(error.localizedDescription)")
                 return
             }
             
-            guard let item = response?.mapItems.first else { return }
+            guard let item = response?.mapItems.first else {
+                self.dataState = .error("startLocationSearch failed")
+                return
+            }
             let coordinate = item.placemark.coordinate
             
             self.selectedStartCoordinate = coordinate
@@ -107,10 +112,14 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         locationSearch(forLocalSearchCompletion: endLocationSearch) { response, error in
             if let error = error {
                 print("DEBUG: Location search failed with error \(error.localizedDescription)")
+                self.dataState = .error("DEBUG: Location search failed with error \(error.localizedDescription)")
                 return
             }
             
-            guard let item = response?.mapItems.first else { return }
+            guard let item = response?.mapItems.first else {
+                self.dataState = .error("endLocationSearch failed")
+                return
+            }
             let coordinate = item.placemark.coordinate
             
             self.selectedEndCoordinate = coordinate
@@ -133,6 +142,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             return update?.location?.coordinate
         } catch {
             print("Cannot get user location")
+            self.dataState = .error("Cannot get user location")
             return nil
         }
     }
@@ -150,6 +160,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 let directions = try await MKDirections(request: request).calculate()
                 self.route = directions.routes.first
             } catch {
+                self.dataState = .error("walking direction error generating")
                 print("Show error")
             }
         }
@@ -188,12 +199,14 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     }
     
     func getDirections() {
+        dataState = .loading
         searchDirection()
 
         guard self.selectedStartCoordinate.latitude != 0.0,
               self.selectedStartCoordinate.longitude != 0.0,
               self.selectedEndCoordinate.latitude != 0.0,
               self.selectedEndCoordinate.longitude != 0.0 else {
+            self.dataState = .error("Invalid coordinates, retrying once valid coordinates are available.")
             print("Invalid coordinates, retrying once valid coordinates are available.")
             return
         }
@@ -262,6 +275,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                     print("Found route: \(matchingRoute.name), \(matchingRoute.id)")
                     bestRoutes = [matchingRoute]
                 } else {
+                    self.dataState = .error("No matching route found")
                     print("No matching route found")
                 }
                 
@@ -270,28 +284,36 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 print(busStopData = getScheduleForInterestedStops(route: bestRoutes[0], schedules: Schedule.getSchedules(by: bestRoutes[0].schedule), interestedStops: self.busStopsGenerated.map { $0.busStopId })
                 )
                 
-                let waypoints: [CLLocationCoordinate2D] = self.busStopsGenerated.map { $0.coordinate }
-                
-                guard waypoints.count >= 2 else { return }
-                
-                routePolylines.removeAll()
-                
-                for index in 0..<waypoints.count - 1 {
-                    let request = MKDirections.Request()
-                    request.source = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index]))
-                    request.destination = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index + 1]))
-                    request.transportType = .automobile
+                if viewState == .routeDetail {
+                    let waypoints: [CLLocationCoordinate2D] = self.busStopsGenerated.map { $0.coordinate }
                     
-                    do {
-                        let directions = try await MKDirections(request: request).calculate()
-                        if let route = directions.routes.first {
-                            routePolylines.append(route.polyline)
+                    guard waypoints.count >= 2 else {
+                        self.dataState = .error("waypoints is less than 2")
+                        return
+                    }
+                    
+                    routePolylines.removeAll()
+                    
+                    for index in 0..<waypoints.count - 1 {
+                        let request = MKDirections.Request()
+                        request.source = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index]))
+                        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index + 1]))
+                        request.transportType = .automobile
+                        
+                        do {
+                            let directions = try await MKDirections(request: request).calculate()
+                            if let route = directions.routes.first {
+                                routePolylines.append(route.polyline)
+                            }
+                        } catch {
+                            self.dataState = .error("Error calculating route: \(error.localizedDescription)")
+                            print("Error calculating route: \(error.localizedDescription)")
                         }
-                    } catch {
-                        print("Error calculating route: \(error.localizedDescription)")
                     }
                 }
+                self.dataState = .loaded
             } else {
+                self.dataState = .error("Could not generate a route.")
                 print("Could not generate a route.")
             }
         }
@@ -316,7 +338,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 bestEta: false,
                 bestStop: false,
                 routes: [route],
-                walkingDistance: 0,
+                startWalkingDistance: 0,
+                endWalkingDistance: 0,
                 estimatedTimeTravel: 0,
                 busStop: busStopsOnRoute
             )
@@ -343,7 +366,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 bestEta: false,
                 bestStop: false,
                 routes: usedRoutes,
-                walkingDistance: 0,
+                startWalkingDistance: 0,
+                endWalkingDistance: 0,
                 estimatedTimeTravel: 0,
                 busStop: combinedStops
             )
@@ -394,8 +418,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
 
         return segments
     }
-
-
     
     
     func generateBusStops(from startBusStop: BusStop, to endBusStop: BusStop, routes: [Route]) -> [BusStop]? {
@@ -422,7 +444,9 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 print("busStopsOnRoute \(busStopsOnRoute)\n")
                 
                 availableRoutes.append(
-                    GeneratedRoute(eta: 0, totalBusStop: busStopsOnRoute.count, bestEta: false, bestStop: false, routes: [route], walkingDistance: 0, estimatedTimeTravel: 0, busStop: busStopsOnRoute)
+                    GeneratedRoute(eta: 0, totalBusStop: busStopsOnRoute.count, bestEta: false, bestStop: false, routes: [route],
+                                   startWalkingDistance: 0,
+                                   endWalkingDistance: 0, estimatedTimeTravel: 0, busStop: busStopsOnRoute)
                 )
                 
                 // Compare the count of bus stops with the current minimum
@@ -542,12 +566,14 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         
         // Find the nearest start bus stop
         guard let startBusStop = self.findNearestBusStop(from: startLocation) else {
+            self.dataState = .error("No nearby start bus stop found.")
             print("No nearby start bus stop found.")
             return nil
         }
         
         // Find the nearest end bus stop
         guard let endBusStop = self.findNearestBusStop(from: endLocation) else {
+            self.dataState = .error("No nearby end bus stop found.")
             print("No nearby end bus stop found.")
             return nil
         }
@@ -569,6 +595,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
         
         if matchingRoutes.isEmpty {
+            self.dataState = .error("No matching routes found.")
             print("No matching routes found.")
             return nil
         }
@@ -598,6 +625,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                     routeEndDestination = directions.routes.first
                 }
             } catch {
+                self.dataState = .error("Get walking from stops directions failed")
                 print("Show error")
             }
         }

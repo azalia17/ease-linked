@@ -34,15 +34,3 @@ struct RoutesResult: View {
         }
     }
 }
-
-#Preview {
-//    RoutesResult(
-//        generatedRoutes: [
-////            GeneratedRoute(eta: 12, totalBusStop: 10, bestEta: true, bestStop: false, routes: [Route.all[0], Route.all[5]], transitAt: "The Breeze"),
-////            GeneratedRoute(eta: 12, totalBusStop: 10, bestEta: false, bestStop: true, routes: [Route.all[0]]),
-////            GeneratedRoute(eta: 12, totalBusStop: 10, bestEta: false, bestStop: false, routes: [Route.all[0]]),
-////            GeneratedRoute(eta: 12, totalBusStop: 10, bestEta: false, bestStop: false, routes: [Route.all[0]]),
-////            GeneratedRoute(eta: 12, totalBusStop: 10, bestEta: false, bestStop: false, routes: [Route.all[0]]),
-//        ]
-//    )
-}

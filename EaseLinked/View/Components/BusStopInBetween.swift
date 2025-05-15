@@ -16,6 +16,10 @@ struct BusStopInBetween: View {
         HStack{
             VStack(spacing: 0){
                 SolidLine(height: 45, color: color)
+                    .overlay{
+                        SolidLine(height: 48, color: color)
+//                            .offset(y: -2)
+                    }
                 if isExpanded {
                     ForEach(busStops) { stop in
                             VStack(alignment: .leading, spacing: 0){
@@ -30,7 +34,7 @@ struct BusStopInBetween: View {
                                     .padding(.horizontal, 7)
                                     .offset(y: -2)
                                     .overlay {
-                                        SolidLine(height: 15, color: color)
+                                        SolidLine(height: 20, color: color)
                                             .padding(.horizontal, 7)
                                     }
                             }
@@ -38,7 +42,10 @@ struct BusStopInBetween: View {
                 }
                 if isExpanded {
                     SolidLine(height: 6, color: color)
-
+                        .overlay{
+                            SolidLine(height: 4, color: color)
+                                .offset(y: 2)
+                        }
                 }
             }
             VStack(alignment: .leading) {
@@ -48,8 +55,9 @@ struct BusStopInBetween: View {
                 ) {
                     VStack() {
                         ForEach(busStops) { stop in
-                            HStack(spacing: 14) {
+                            HStack(spacing: 0) {
                                 ImageStack(isSmall: true, images: stop.images)
+                                    .padding(.trailing, 14)
                                 Text(stop.name)
                                     .font(.callout)
                                 Spacer()
@@ -66,6 +74,8 @@ struct BusStopInBetween: View {
                 Divider()
             }
         }
+        .padding(.leading, 12)
+        .offset(x: isExpanded ? -7 : 0)
     }
 }
 

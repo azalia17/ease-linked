@@ -17,13 +17,16 @@ struct GeneratedRoute: Identifiable, Codable {
     let bestStop: Bool
     let routes: [Route]
     var transitAt: String = ""
-    let walkingDistance: Int
+    let startWalkingDistance: Int
+    let endWalkingDistance: Int
     let estimatedTimeTravel: Int
-    let busStop: [BusStop]
+    var busStop: [BusStop]
 //    let transitBusStop: BusStop
     
     var routesId: [String] { routes.map {$0.id} }
-    
+    var busses: [Bus] {
+        Bus.getBusses(byRoutes: routesId)
+    }
 }
 
 
