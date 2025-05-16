@@ -45,6 +45,7 @@ struct RouteSelectedDetail: View {
             PathEnd(endLocation: endLocation, walkingDistance: generatedRoutes.endWalkingDistance, walkingTime: endWalkingTime)
         }
         .padding(.bottom, 40)
+        
     }
 }
 

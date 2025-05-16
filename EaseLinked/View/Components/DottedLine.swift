@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DottedLine: View {
-    var height: CGFloat = 40
+    var height: CGFloat = 40.0
     
     var body: some View {
         Path { path in

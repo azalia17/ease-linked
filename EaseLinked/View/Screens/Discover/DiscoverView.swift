@@ -17,25 +17,51 @@ struct DiscoverView: View {
     @State private var selectedDetent: PresentationDetent = .medium
     @Binding var isPresented: Bool
     
-    @Environment(\.verticalSizeClass) private var sizeClass
+    @State var showInfoSheet: Bool = false
     
     var body: some View {
         ZStack(alignment: .top) {
             Map(initialPosition: cameraPosition) {
                 UserAnnotation().tint(.blue)
-                Marker(discoverViewModel.startLocationQueryFragment, systemImage: "mappin.circle.fill", coordinate: discoverViewModel.selectedStartCoordinate)
-                    .tint(.red.gradient)
+                Annotation(discoverViewModel.startLocationQueryFragment, coordinate: discoverViewModel.selectedStartCoordinate, anchor: .bottom) {
+                    Image(systemName: "mappin")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(.white)
+                        .frame(width: 20, height: 20)
+                        .padding(12)
+                        .background(.black.gradient, in: .circle)
+                        
+                }.stroke(.white, lineWidth: 1)
+                Annotation(discoverViewModel.endLocationQueryFragment, coordinate: discoverViewModel.selectedEndCoordinate, anchor: .bottom) {
+                    Image(systemName: "flag.pattern.checkered")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(.white)
+                        .frame(width: 20, height: 20)
+                        .padding(12)
+                        .background(.black.gradient, in: .circle)
+                        
+                }.stroke(.white, lineWidth: 1)
                 
-                Marker(discoverViewModel.endLocationQueryFragment, systemImage: "flag.circle.fill", coordinate: discoverViewModel.selectedEndCoordinate)
-                    .tint(.red.gradient)
-                
-                if discoverViewModel.viewState == .routeDetail {
+                if discoverViewModel.viewState == .routeDetail && discoverViewModel.dataState == .loaded {
+                    
                     ForEach(discoverViewModel.busStopsGenerated) { identifiableCoordinate in
                         Marker(identifiableCoordinate.busStopName,
                                systemImage: "bus",
                                coordinate: identifiableCoordinate.coordinate
                         ) // Access the coordinate here
-                        .tint(.orange.gradient)
+                        .tint(discoverViewModel.selectedRoutes.routes[0].color.gradient)
+                    }
+                    MapPolyline(discoverViewModel.routeStartDestination!)
+                        .stroke(Color(.systemGray), style: StrokeStyle(lineWidth: 5, lineCap: .round,dash: [1, 8]))
+                    
+                    MapPolyline(discoverViewModel.routeEndDestination!)
+                        .stroke(Color(.systemGray), style: StrokeStyle(lineWidth: 5, lineCap: .round,dash: [1, 8]))
+                    
+                    ForEach(discoverViewModel.routePolylines, id: \.self) { polyline in
+                        MapPolyline(polyline)
+                            .stroke(discoverViewModel.selectedRoutes.routes[0].color, lineWidth: 5)
                     }
                 }
             }
@@ -62,7 +88,6 @@ struct DiscoverView: View {
                 .safeAreaPadding()
                 .frame(height: 150)
                 .padding(.bottom)
-                
                 .background( .gray.opacity(0.27))
                 .background( .white.opacity(0.8))
                 
@@ -151,9 +176,18 @@ struct DiscoverView: View {
                             }
                         }
                         else {
-                            
-                            RouteSelectedDetail(generatedRoutes: discoverViewModel.selectedRoutes!, estimatedTimeSpent: 10, buses: discoverViewModel.selectedRoutes!.busses, startLocation: discoverViewModel.startLocationQueryFragment, endLocation: discoverViewModel.endLocationQueryFragment, startWalkingTime: 10, endWalkingTime: 10, scheduleTime: [])
-                                .padding(.horizontal)
+                            switch discoverViewModel.dataState {
+                            case .loading:
+                                Text("Loading...")
+                            case .loaded:
+                                RouteSelectedDetail(generatedRoutes: discoverViewModel.selectedRoutes, estimatedTimeSpent: 10, buses: discoverViewModel.selectedRoutes.busses, startLocation: discoverViewModel.startLocationQueryFragment, endLocation: discoverViewModel.endLocationQueryFragment, startWalkingTime: 10, endWalkingTime: 10, scheduleTime: [])
+                                    .padding(.horizontal)
+                                    .sheet(isPresented: $showInfoSheet) {
+                                        Text("Hello")
+                                    }
+                            case .error(let error):
+                                Text(error)
+                            }
                             
                         }
                     case .error(let error):
@@ -170,7 +204,7 @@ struct DiscoverView: View {
                                     .font(.title3)
                                     .bold()
                             } else {
-                                JourneyTile(startWalkingTime: 10, startStop: discoverViewModel.selectedRoutes!.busStop[0].name, endStop: discoverViewModel.selectedRoutes!.busStop[discoverViewModel.selectedRoutes!.busStop.count - 1].name, endWalkingTime: 10)
+                                JourneyTile(startWalkingTime: 10, startStop: discoverViewModel.selectedRoutes.busStop[0].name, endStop: discoverViewModel.selectedRoutes.busStop[discoverViewModel.selectedRoutes.busStop.count - 1].name, endWalkingTime: 10)
                             }
                         }
                         
@@ -192,7 +226,7 @@ struct DiscoverView: View {
                                     
                                     Button(
                                         action: {
-                                            
+                                            showInfoSheet = true
                                         },
                                         label : {
                                             Image(systemName: "info")
@@ -207,9 +241,9 @@ struct DiscoverView: View {
                                 Button(
                                     action: {
                                         if discoverViewModel.viewState == .routeDetail {
-                                            discoverViewModel.updateViewState(.result)
+                                            discoverViewModel.backToResultSheet()
                                         } else {
-                                            discoverViewModel.updateViewState(.search)
+                                            discoverViewModel.backToSearchSheet()
                                         }
                                     },
                                     label : {
