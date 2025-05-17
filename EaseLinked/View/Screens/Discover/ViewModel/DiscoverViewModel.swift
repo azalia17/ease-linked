@@ -235,16 +235,16 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     
     func updateBestStopAllRoutes(allRoutes: [GeneratedRoute]) {
         var updatedRoutes = allRoutes  // Make a mutable copy
-        
+
         for i in 0..<updatedRoutes.count {
             guard
                 updatedRoutes[i].busStop.count >= 2,
                 let route = updatedRoutes[i].routes.first
             else { continue }
-            
+
             let fromStop = updatedRoutes[i].busStop[0].id
             let toStop = updatedRoutes[i].busStop[1].id
-            
+
             // Find the correct index in the route's busStops
             for j in 0..<(route.busStops.count - 1) {
                 if route.busStops[j] == fromStop && route.busStops[j + 1] == toStop {
@@ -253,7 +253,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 }
             }
         }
-        
+
         updatedRoutes = getScheduleTimeStartStop(allRoutes: updatedRoutes)
 
         DispatchQueue.main.async {
@@ -262,24 +262,96 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 return
             }
 
-            let sortedRoutes = updatedRoutes.sorted {
-                if $0.totalBusStop == $1.totalBusStop {
-                    return $0.eta < $1.eta
-                } else {
-                    return $0.totalBusStop < $1.totalBusStop
-                }
-            }
+            // Find the one with least totalBusStop
+            let minStopCount = updatedRoutes.map { $0.totalBusStop }.min()
+            let bestStopRouteID = updatedRoutes.first(where: { $0.totalBusStop == minStopCount })?.id
 
-            let bestRoute = sortedRoutes.first
+            // Find the one with least eta
+            let minEta = updatedRoutes.map { $0.eta }.min()
+            let bestEtaRouteID = updatedRoutes.first(where: { $0.eta == minEta })?.id
 
-            self.availableRoutes = sortedRoutes.map { route in
+//            self.availableRoutes = updatedRoutes.map { route in
+//                var updated = route
+//                updated.bestStop = (route.id == bestStopRouteID)
+//                updated.bestEta = (route.id == bestEtaRouteID)
+//                return updated
+//            }
+            
+            let prioritizedRoutes = updatedRoutes.map { route -> GeneratedRoute in
                 var updated = route
-                updated.bestStop = (route.id == bestRoute?.id)
-                updated.bestEta = (route.id == bestRoute?.id)
+                updated.bestStop = (route.id == bestStopRouteID)
+                updated.bestEta = (route.id == bestEtaRouteID)
                 return updated
+            }.sorted { lhs, rhs in
+                // Priority: both true > bestStop only > bestEta only > others
+                let lhsPriority = (lhs.bestStop ? 2 : 0) + (lhs.bestEta ? 1 : 0)
+                let rhsPriority = (rhs.bestStop ? 2 : 0) + (rhs.bestEta ? 1 : 0)
+
+                if lhsPriority != rhsPriority {
+                    return lhsPriority > rhsPriority
+                }
+
+                // Secondary sort: totalBusStop, then eta
+                if lhs.totalBusStop != rhs.totalBusStop {
+                    return lhs.totalBusStop < rhs.totalBusStop
+                }
+
+                return lhs.eta < rhs.eta
             }
+
+            self.availableRoutes = prioritizedRoutes
+
         }
     }
+
+    
+//    func updateBestStopAllRoutes(allRoutes: [GeneratedRoute]) {
+//        var updatedRoutes = allRoutes  // Make a mutable copy
+//        
+//        for i in 0..<updatedRoutes.count {
+//            guard
+//                updatedRoutes[i].busStop.count >= 2,
+//                let route = updatedRoutes[i].routes.first
+//            else { continue }
+//            
+//            let fromStop = updatedRoutes[i].busStop[0].id
+//            let toStop = updatedRoutes[i].busStop[1].id
+//            
+//            // Find the correct index in the route's busStops
+//            for j in 0..<(route.busStops.count - 1) {
+//                if route.busStops[j] == fromStop && route.busStops[j + 1] == toStop {
+//                    updatedRoutes[i].startStopScheduleId = j
+//                    break
+//                }
+//            }
+//        }
+//        
+//        updatedRoutes = getScheduleTimeStartStop(allRoutes: updatedRoutes)
+//
+//        DispatchQueue.main.async {
+//            guard !updatedRoutes.isEmpty else {
+//                self.availableRoutes = []
+//                return
+//            }
+//
+//            let sortedRoutes = updatedRoutes.sorted {
+//                if $0.totalBusStop == $1.totalBusStop {
+//                    return $0.eta < $1.eta
+//                } else {
+//                    return $0.totalBusStop < $1.totalBusStop
+//                }
+//            }
+//
+//            let bestRoute = sortedRoutes.first
+//
+//            self.availableRoutes = sortedRoutes.map { route in
+//                var updated = route
+//                updated.bestStop = (route.id == bestRoute?.id)
+//                updated.bestEta = (route.id == bestRoute?.id)
+//                return updated
+//            }
+//        }
+//    }
 
 //    func getScheduleTimeStartStop(allRoutes : [GeneratedRoute]) -> [GeneratedRoute] {
 //        var updatedRoute = allRoutes
