@@ -89,12 +89,17 @@ struct RouteTransitStopDetail: View {
                     schedules: scheduleTime, isRoute7: generatedRoutes.routes[0].id == "route_7"
                 )
             }
+            if !generatedRoutes.fromStartToTransit.isEmpty {
+                BusStopInBetween(color: generatedRoutes.routes[0].color, busStops: generatedRoutes.fromStartToTransit)
+            }
             BusStopBigSection(route: generatedRoutes.routes[1], busStop: generatedRoutes.transitBusStop[0], scheduleIndex: 0, startStop: false, transitStop: true, previousRouteColor: generatedRoutes.routes[0].color) {
                 ScheduleGrid(
                     schedules: scheduleTime, isRoute7: generatedRoutes.routes[0].id == "route_7"
                 )
             }
-            
+            if !generatedRoutes.fromTransitToEnd.isEmpty {
+                BusStopInBetween(color: generatedRoutes.routes[1].color, busStops: generatedRoutes.fromTransitToEnd)
+            }
             BusStopBigSection(route: generatedRoutes.routes[1], busStop: generatedRoutes.busStop[generatedRoutes.busStop.count-1], scheduleIndex: 0, startStop: false, transitStop: false) {
                 ScheduleGrid(
                     schedules: scheduleTime, isRoute7: generatedRoutes.routes[0].id == "route_7"

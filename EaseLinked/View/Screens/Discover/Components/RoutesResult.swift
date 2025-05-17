@@ -16,7 +16,7 @@ struct RoutesResult: View {
             ForEach(generatedRoutes) { generatedRoute in
                 RouteResultTile(
                     eta: generatedRoute.eta,
-                    totalBusStop: generatedRoute.totalBusStop,
+                    totalBusStop: generatedRoute.totalBusStops,
                     bestEta: generatedRoute.bestEta,
                     bestStop: generatedRoute.bestStop,
                     routes: generatedRoute.routes,

@@ -83,7 +83,7 @@ struct RouteInfoSheet: View {
                                 .padding(.horizontal, 6)
                                 .background(route.color)
                                 .cornerRadius(4)
-                            Text("\(route.name)'s")
+                            Text(route.name)
                         }
                     }
                 }

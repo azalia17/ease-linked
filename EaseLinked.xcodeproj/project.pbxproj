@@ -29,9 +29,22 @@
 		EB2892F02DC0BE5B006FC925 /* EaseLinkedUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EaseLinkedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		EB2895FC2DD72DC4006FC925 /* Exceptions for "EaseLinked" folder in "EaseLinked" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = EB2892D52DC0BE59006FC925 /* EaseLinked */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		EB2892D82DC0BE59006FC925 /* EaseLinked */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				EB2895FC2DD72DC4006FC925 /* Exceptions for "EaseLinked" folder in "EaseLinked" target */,
+			);
 			path = EaseLinked;
 			sourceTree = "<group>";
 		};
@@ -399,6 +412,7 @@
 				DEVELOPMENT_TEAM = L58PF7D296;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EaseLinked/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need the location to show it on the map.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -429,6 +443,7 @@
 				DEVELOPMENT_TEAM = L58PF7D296;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EaseLinked/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need the location to show it on the map.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

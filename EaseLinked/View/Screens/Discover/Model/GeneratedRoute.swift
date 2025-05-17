@@ -14,7 +14,7 @@ struct GeneratedRoute: Identifiable, Codable {
     let eta: Int
     let totalBusStop: Int
     let bestEta: Bool
-    let bestStop: Bool
+    var bestStop: Bool
     let routes: [Route]
     var transitAt: String = ""
     let startWalkingDistance: Int
@@ -23,6 +23,10 @@ struct GeneratedRoute: Identifiable, Codable {
     var busStop: [BusStop]
 //    var transitBusStop: [BusStop] = []
     
+    var totalBusStops: Int {
+        removeDuplicates(from: busStop).count
+    }
+        
     var routesId: [String] { routes.map {$0.id} }
     var busses: [Bus] {
         Bus.getBusses(byRoutes: routesId)
@@ -39,6 +43,42 @@ struct GeneratedRoute: Identifiable, Codable {
         }
     }
 }
+
+extension GeneratedRoute {
+    
+    /// Remove duplicates by BusStop ID, preserving the order
+    func removeDuplicates(from stops: [BusStop]) -> [BusStop] {
+        var seen = Set<String>()
+        return stops.filter { stop in
+            guard !seen.contains(stop.id) else { return false }
+            seen.insert(stop.id)
+            return true
+        }
+    }
+
+    var fromStartToTransit: [BusStop] {
+        guard let transit = transitBusStop.first,
+              let transitIndex = busStop.firstIndex(where: { $0.id == transit.id }),
+              busStop.count >= 2 else {
+            return []
+        }
+        
+        let slice = busStop.dropFirst().prefix(upTo: transitIndex)
+        return removeDuplicates(from: Array(slice))
+    }
+    
+    var fromTransitToEnd: [BusStop] {
+        guard let transit = transitBusStop.first,
+              let lastTransitIndex = busStop.lastIndex(where: { $0.id == transit.id }),
+              busStop.count >= 2 else {
+            return []
+        }
+        
+        let slice = busStop.suffix(from: lastTransitIndex + 1).dropLast()
+        return removeDuplicates(from: Array(slice))
+    }
+}
+
 
 
 struct IdentifiableCoordinate: Identifiable {
