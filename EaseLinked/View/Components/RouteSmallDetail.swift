@@ -24,7 +24,7 @@ struct RouteSmallDetail: View {
                 .resizable()
                 .frame(width: 4, height: 4)
                 .foregroundStyle(.gray.opacity(0.4))
-            RouteSmallDetailChip(icon: "bus", text: "\(eta) min")
+            RouteSmallDetailChip(icon: "bus", text: "\(eta) WIB")
         }
     }
 }

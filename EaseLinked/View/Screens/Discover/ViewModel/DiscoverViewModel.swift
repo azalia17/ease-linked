@@ -279,17 +279,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 return updated
             }
         }
-        
-//        for r in availableRoutes {
-//            print("availble route \(r.routes[0].name) ")
-//            print("index \(r.startStopScheduleId)")
-//            for s in r.startStopScheduleTime {
-//                print(formatTime(from: s.time))
-//                print(s.time)
-//            }
-////            print("at \(r.startStopScheduleTime)")
-//            print("")
-//        }
     }
 
     func getScheduleTimeStartStop(allRoutes : [GeneratedRoute]) -> [GeneratedRoute] {
@@ -297,12 +286,9 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         
         for i in 0..<updatedRoute.count {
             let scheduleUsed = updatedRoute[i].routes[0].schedule
-            print("scheduleUsed :\(scheduleUsed)")
-//            let scheduleTime = ScheduleDetail.getScheduleTime(schedule: scheduleUsed, index: updatedRoute[i].startStopScheduleId, busStopId: updatedRoute[i].busStop[0].id)
+            
             let scheduleTime = ScheduleDetail.getScheduleTimes(schedule: scheduleUsed, index: updatedRoute[i].startStopScheduleId, busStopId: updatedRoute[i].busStop[0].id, route: updatedRoute[i].routes[0].id)
-            print("startStopScheduleId :\(updatedRoute[i].startStopScheduleId)")
-            print("busStopId :\(updatedRoute[i].busStop[0].id)")
-            print("scheduleTime :\(scheduleTime)")
+            
             updatedRoute[i].startStopScheduleTime = scheduleTime
             
             print("")
@@ -350,108 +336,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             }
 
             addPolyLines(tempPolyLines)
-
-            // 🟨 Assign schedule info
-            let allSchedules = Schedule.all
-            let route = generatedRoute.routes.first! // for now we assume route[0]
-
-            var stopsOfInterest = [startBusStop?.id].compactMap { $0 }
-
-            if let transit = generatedRoute.transitBusStop.first {
-                stopsOfInterest.append(transit.id)
-            }
-
-//            let schedulesForStops = getScheduleForInterestedStops(route: route, schedules: allSchedules, interestedStops: stopsOfInterest)
-            
-//            print(Schedule.getGroupedScheduleTimesByBusStop(for: generatedRoute.routes[0]))
-//            let grouped = Schedule.getGroupedScheduleTimesByBusStop(for: generatedRoute.routes[0])
-//
-//            // Example output:
-//            for (busStopId, items) in grouped {
-//                print("🚌 \(busStopId)")
-//                for (index, time) in items {
-//                    print(" - Index \(index): \(time.time)")
-//                }
-//            }
-//            
-//            for i in 0..<(generatedRoute.routes[0].busStops.count - 1) {
-//                if generatedRoute.routes[0].busStops[i] == generatedRoute.busStop[0].id && generatedRoute.routes[0].busStops[i + 1] == generatedRoute.busStop[1].id {
-////                    print("Found '\(generatedRoute.busStop[0].name)' at index \(i), followed by '\(generatedRoute.busStop[1].name)'")
-//                    generatedRoute.startStopScheduleId = i
-//                    break
-//                }
-//            }
-
-//            DispatchQueue.main.async {
-//                self.
-//                selectedRoutes.schedulesByStop = schedulesForStops
-//            }
-//            for sched in schedulesForStops {
-//                print("sched \(sched)")
-//                print("")
-//            }
         }
     }
-
-    func getScheduleForInterestedStops(route: Route, schedules: [Schedule], interestedStops: [String]) -> [String: [String]] {
-        var result: [String: [String]] = [:]
-
-        for schedule in schedules {
-            for stop in interestedStops {
-                let details = schedule.scheduleDetail.filter { $0.contains(stop) }
-
-                if !details.isEmpty {
-                    result[stop, default: []].append(contentsOf: details)
-                }
-            }
-        }
-
-        for (stop, details) in result {
-            result[stop] = details.sorted {
-                extractNumber(from: $0) < extractNumber(from: $1)
-            }
-        }
-
-        return result
-    }
-
-    
-//    func getRouteDetails(_ generatedRoute: GeneratedRoute) -> Void {
-//        Task {
-//            getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop!.latitude, longitude: startBusStop!.longitude), type: "start")
-//            
-//            getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop!.latitude, longitude: endBusStop!.longitude), type: "end")
-//            
-//            generateBusStopCoordinates(from: generatedRoute.busStop)
-//            
-//            let waypoints: [CLLocationCoordinate2D] = busStopsGenerated.map { $0.coordinate }
-//            
-//            guard waypoints.count >= 2 else {
-//                self.updateDataState(.error("waypoints is less than 2"))
-//                return
-//            }
-//            
-//            var tempPolyLines: [MKPolyline] = []
-//            
-//            for index in 0..<waypoints.count - 1 {
-//                let request = MKDirections.Request()
-//                request.source = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index]))
-//                request.destination = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index + 1]))
-//                request.transportType = .automobile
-//                
-//                do {
-//                    let directions = try await MKDirections(request: request).calculate()
-//                    if let route = directions.routes.first {
-//                        tempPolyLines.append(route.polyline)
-//                    }
-//                } catch {
-//                    self.updateDataState(.error("Error calculating route: \(error.localizedDescription)"))
-//                }
-//            }
-//            
-//            addPolyLines(tempPolyLines)
-//        }
-//    }
     
     func addPolyLines(_ polyLines: [MKPolyline]) -> Void {
         DispatchQueue.main.async {
@@ -521,10 +407,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             
             result.append(generated)
         }
-//        for res in result {
-//            print("result \(res)")
-//            print("")
-//        }
 
         return result
         
@@ -573,7 +455,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     
     func generatePathsWithTransfers(startBusStop: BusStop, endBusStop: BusStop, routes: [Route]) -> [[BusStop]] {
         var possiblePaths: [[BusStop]] = []
-//        var possiblePathsWithTransit: [[BusStop]] = []
         
         // Find transit bus stops (those that appear in multiple routes)
         let transitBusStops = BusStop.all.filter { $0.isTransitStop }
