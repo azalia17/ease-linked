@@ -248,7 +248,50 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
     
+//    func updateWalkingRoute(startRoute: MKRoute, endRoute: MKRoute, allRoutes: [GeneratedRoute]) {
+//        DispatchQueue.main.async {
+//            self.routeStartDestination = startRoute
+//            self.startWalkingDistance = Int(startRoute.distance)
+//            self.startWalkingTime = Int(startRoute.expectedTravelTime / 60)
+//
+//            self.routeEndDestination = endRoute
+//            self.endWalkingDistance = Int(endRoute.distance)
+//            self.endWalkingTime = Int(endRoute.expectedTravelTime / 60)
+//            
+//            self.updateBestStopAllRoutes(allRoutes: self.updateAllRoutes(allRoutes: allRoutes))
+//            self.updateDataState(.loaded)
+//        }
+//    }
+    
     func updateWalkingRoute(startRoute: MKRoute, endRoute: MKRoute, allRoutes: [GeneratedRoute]) {
+        Task {
+            // 🚶‍♂️ Update walking details (this is fine on background thread)
+//            self.routeStartDestination = startRoute
+//            self.startWalkingDistance = Int(startRoute.distance)
+//            self.startWalkingTime = Int(startRoute.expectedTravelTime / 60)
+//
+//            self.routeEndDestination = endRoute
+//            self.endWalkingDistance = Int(endRoute.distance)
+//            self.endWalkingTime = Int(endRoute.expectedTravelTime / 60)
+
+            updateWalkingRouteUI(startRoute: startRoute, endRoute: endRoute)
+            
+            // 🧹 Remove duplicate routes
+            let cleanedRoutes = self.updateAllRoutes(allRoutes: allRoutes)
+
+            // 🧠 Compute estimated travel time
+            let enrichedRoutes = await self.calculateTravelTimeForAllRoutes(cleanedRoutes)
+
+            // 🚀 Push to UI on main thread
+//            DispatchQueue.main.async {
+//                self.updateBestStopAllRoutes(allRoutes: enrichedRoutes)
+//                self.updateDataState(.loaded)
+//            }
+            updateRoutesLoaded(enrichedRoutes: enrichedRoutes)
+        }
+    }
+    
+    func updateWalkingRouteUI(startRoute: MKRoute, endRoute: MKRoute) {
         DispatchQueue.main.async {
             self.routeStartDestination = startRoute
             self.startWalkingDistance = Int(startRoute.distance)
@@ -257,8 +300,12 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             self.routeEndDestination = endRoute
             self.endWalkingDistance = Int(endRoute.distance)
             self.endWalkingTime = Int(endRoute.expectedTravelTime / 60)
-            
-            self.updateBestStopAllRoutes(allRoutes: self.updateAllRoutes(allRoutes: allRoutes))
+        }
+    }
+
+    func updateRoutesLoaded(enrichedRoutes: [GeneratedRoute]) {
+        DispatchQueue.main.async {
+            self.updateBestStopAllRoutes(allRoutes: enrichedRoutes)
             self.updateDataState(.loaded)
         }
     }
@@ -430,6 +477,46 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             self.updateDataState(.loaded)
         }
     }
+    
+    func calculateTravelTimeForAllRoutes(_ routes: [GeneratedRoute]) async -> [GeneratedRoute] {
+        var updatedRoutes: [GeneratedRoute] = []
+
+        for var route in routes {
+            var totalTime: TimeInterval = 0
+            let waypoints = route.busStop.map {
+                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+            }
+
+            guard waypoints.count >= 2 else {
+                route.estimatedTimeTravel = 0
+                updatedRoutes.append(route)
+                continue
+            }
+
+            for i in 0..<waypoints.count - 1 {
+                let request = MKDirections.Request()
+                request.source = MKMapItem(placemark: .init(coordinate: waypoints[i]))
+                request.destination = MKMapItem(placemark: .init(coordinate: waypoints[i + 1]))
+                request.transportType = .automobile
+
+                do {
+                    let directions = try await MKDirections(request: request).calculate()
+                    if let routeResult = directions.routes.first {
+                        totalTime += routeResult.expectedTravelTime
+                    }
+                } catch {
+                    print("❌ Route segment error: \(error.localizedDescription)")
+                }
+            }
+
+            // Add walking time if available
+            route.estimatedTimeTravel = Int(totalTime / 60) + self.startWalkingTime + self.endWalkingTime
+            updatedRoutes.append(route)
+        }
+
+        return updatedRoutes
+    }
+
 
     
     func addPolyLines(_ polyLines: [MKPolyline]) -> Void {
