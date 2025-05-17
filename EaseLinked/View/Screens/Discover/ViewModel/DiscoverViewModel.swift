@@ -253,6 +253,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 }
             }
         }
+        
+        updatedRoutes = getScheduleTimeStartStop(allRoutes: updatedRoutes)
 
         DispatchQueue.main.async {
             guard !updatedRoutes.isEmpty else {
@@ -279,12 +281,35 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
         
 //        for r in availableRoutes {
-//            print("availble route \(r.routes) ")
+//            print("availble route \(r.routes[0].name) ")
 //            print("index \(r.startStopScheduleId)")
+//            for s in r.startStopScheduleTime {
+//                print(formatTime(from: s.time))
+//                print(s.time)
+//            }
+////            print("at \(r.startStopScheduleTime)")
 //            print("")
 //        }
     }
 
+    func getScheduleTimeStartStop(allRoutes : [GeneratedRoute]) -> [GeneratedRoute] {
+        var updatedRoute = allRoutes
+        
+        for i in 0..<updatedRoute.count {
+            let scheduleUsed = updatedRoute[i].routes[0].schedule
+            print("scheduleUsed :\(scheduleUsed)")
+//            let scheduleTime = ScheduleDetail.getScheduleTime(schedule: scheduleUsed, index: updatedRoute[i].startStopScheduleId, busStopId: updatedRoute[i].busStop[0].id)
+            let scheduleTime = ScheduleDetail.getScheduleTimes(schedule: scheduleUsed, index: updatedRoute[i].startStopScheduleId, busStopId: updatedRoute[i].busStop[0].id, route: updatedRoute[i].routes[0].id)
+            print("startStopScheduleId :\(updatedRoute[i].startStopScheduleId)")
+            print("busStopId :\(updatedRoute[i].busStop[0].id)")
+            print("scheduleTime :\(scheduleTime)")
+            updatedRoute[i].startStopScheduleTime = scheduleTime
+            
+            print("")
+        }
+        
+        return updatedRoute
+    }
 
     func updateAllRoutes(allRoutes : [GeneratedRoute]) -> [GeneratedRoute] {
         return allRoutes.uniqued(by: { $0.busStop.map(\.id).joined(separator: "->") })

@@ -14,6 +14,7 @@ struct RouteResultTile: View {
     let bestStop: Bool
     let routes: [Route]
     var transitAt: String = ""
+    let actualEta: String
     
     var body: some View {
         HStack(alignment: bestEta || bestStop ? .top : .center, spacing: 14) {
@@ -39,7 +40,8 @@ struct RouteResultTile: View {
                         RouteSmallDetailChip(icon: "arrow.trianglehead.branch", text: "Transit at \(transitAt)")
                     }
                     
-                    RouteSmallDetail(walkingDistance: 1, estimatedTravelTime: 40)
+                    RouteSmallDetail(walkingDistance: 1, estimatedTravelTime: 40,
+                        eta:actualEta)
                 }
             }
         }
@@ -48,8 +50,8 @@ struct RouteResultTile: View {
 }
 
 #Preview {
-    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: true, bestStop: false, routes: [Route.all[1], Route.all[4]], transitAt: "The Breeze")
-    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: false, routes: [Route.all[0], Route.all[5]], transitAt: "CBD Timur")
-    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: true, routes: [Route.all[0], Route.all[1]], transitAt: "Lobby House of Tiktokers")
-    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: true, routes: [Route.all[0]])
+//    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: true, bestStop: false, routes: [Route.all[1], Route.all[4]], transitAt: "The Breeze")
+//    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: false, routes: [Route.all[0], Route.all[5]], transitAt: "CBD Timur")
+//    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: true, routes: [Route.all[0], Route.all[1]], transitAt: "Lobby House of Tiktokers")
+//    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: true, routes: [Route.all[0]])
 }

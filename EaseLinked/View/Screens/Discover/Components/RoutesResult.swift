@@ -20,7 +20,9 @@ struct RoutesResult: View {
                     bestEta: generatedRoute.bestEta,
                     bestStop: generatedRoute.bestStop,
                     routes: generatedRoute.routes,
-                    transitAt: generatedRoute.transitAt
+                    transitAt: generatedRoute.transitAt,
+                    actualEta: "00:00"
+//                    actualEta: formatTime(from: generatedRoute.startStopScheduleTime[0].time)
                 )
                 .onTapGesture {
                     action(generatedRoute)

@@ -24,7 +24,11 @@ struct GeneratedRoute: Identifiable, Codable {
     
     var schedulesByStop: [String: [String]] = [:]
     
-    var startStopScheduleId: Int = 0
+    var startStopScheduleId: Int = -1
+    var startStopScheduleTime: [ScheduleTime] = []
+    
+    var transitStopScheduleId: Int = -1
+    var transitStopScheduleTime: [ScheduleTime] = []
     
     var totalBusStops: Int {
         removeDuplicates(from: busStop).count

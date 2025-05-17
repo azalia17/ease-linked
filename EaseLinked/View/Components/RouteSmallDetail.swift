@@ -10,6 +10,7 @@ import SwiftUI
 struct RouteSmallDetail: View {
     let walkingDistance: Int
     let estimatedTravelTime: Int
+    let eta: String
     
     var body: some View {
         HStack {
@@ -19,10 +20,15 @@ struct RouteSmallDetail: View {
                 .frame(width: 4, height: 4)
                 .foregroundStyle(.gray.opacity(0.4))
             RouteSmallDetailChip(icon: "plusminus", text: "\(estimatedTravelTime) min")
+            Image(systemName: "circle.fill")
+                .resizable()
+                .frame(width: 4, height: 4)
+                .foregroundStyle(.gray.opacity(0.4))
+            RouteSmallDetailChip(icon: "bus", text: "\(eta) min")
         }
     }
 }
 
 #Preview {
-    RouteSmallDetail(walkingDistance: 10, estimatedTravelTime: 10)
+    RouteSmallDetail(walkingDistance: 10, estimatedTravelTime: 10, eta: "07:00")
 }

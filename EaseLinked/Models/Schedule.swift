@@ -667,6 +667,37 @@ extension ScheduleDetail {
         return schedules
     }
     
+    static func getScheduleTimes(schedule: [String], index: Int, busStopId: String, route: String) -> [ScheduleTime] {
+        var sTime: [ScheduleTime] = []
+        var schedules: [Schedule] = []
+        var scheduleDetail: [ScheduleDetail] = []
+        var scheduleDetailId: [String] = []
+//        var scheduleDetail
+        schedules = Schedule.getSchedules(by: schedule)
+        
+//        print("schedules: \(schedules)")
+        
+        for schedul in schedules {
+            scheduleDetailId.append(schedul.scheduleDetail[index])
+        }
+        
+        scheduleDetail = getManyScheduleDetails(by: scheduleDetailId).filter { $0.busStop == busStopId && $0.index == index + 1 }
+        
+        sTime = scheduleDetail.flatMap { $0.time }
+        print("scheduleDetail: \(scheduleDetail)")
+        
+//        sTime = getScheduleTime(schedule: scheduleDetailId, index: index + 1, busStopId: busStopId)
+        
+        print("sTime: \(sTime)")
+        print("")
+
+//        for sched in scheduleDetailId {
+//            sTime = ScheduleTime.filter {$0.}
+//        }
+        
+        return sTime
+    }
+    
     static func getScheduleTime(schedule: [String], index: Int, busStopId: String) -> [ScheduleTime] {
         return getManyScheduleDetails(by: schedule).filter { $0.index == index && $0.busStop == busStopId }.first?.time ?? [ScheduleTime(time: timeFrom(0, 0))]
     }
