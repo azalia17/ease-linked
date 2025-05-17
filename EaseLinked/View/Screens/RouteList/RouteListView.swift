@@ -32,7 +32,6 @@ struct RouteListView: View {
             }
         }
     }
-    //    }
     
     var body: some View {
         NavigationStack {
@@ -81,8 +80,6 @@ struct RouteListView: View {
                         }
                         .background(Color(.systemGray6))
                         .cornerRadius(12)
-                        //                    .safeAreaPadding(.horizontal)
-                        
                     }
                     
                     //Buat nampilin list rute yang disearch

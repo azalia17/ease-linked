@@ -15,8 +15,8 @@ struct HalteList: View {
     var body: some View {
         List(halteNames) { halte in
             HStack {
-                Image(systemName: "mappin") // Ikon lokasi
-                Text(halte.name) // Nama halte
+                Image(systemName: "mappin")
+                Text(halte.name)
             }
             .padding(.vertical, 8)
         }

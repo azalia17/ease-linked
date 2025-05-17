@@ -11,7 +11,7 @@ import SwiftUI
 
 struct ImageCarousel: View {
     let images: [String]
-    @State private var index: Int = 0 // Always starts from first image
+    @State private var index: Int = 0
     @State private var scale: CGFloat = 1.0
     @State private var lastScale: CGFloat = 1.0
     var onClose: () -> Void
@@ -21,7 +21,7 @@ struct ImageCarousel: View {
             Color.black.opacity(0.8)
                 .edgesIgnoringSafeArea(.all)
                 .onTapGesture {
-                    onClose() // Tap outside to close
+                    onClose() 
                 }
             
             TabView(selection: $index) {

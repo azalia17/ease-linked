@@ -95,8 +95,6 @@ struct BusStopBigSection<ExpandedContent: View>: View {
                         images: busStop.images,
                         busStopName: busStop.name,
                         earliestEta: earliestEta,
-//                        earliestTime: formatTime(from: earliestEta[0].time),
-//                        secondEarliestTime: formatTime(from: earliestEta[1].time),
                         isTransit: transitStop,
                         isExpanded: $isExpanded
                     )
@@ -112,8 +110,6 @@ struct BusStopBigSection<ExpandedContent: View>: View {
 struct DisclosureLabelBusStop : View {
     let images: [String]
     let busStopName: String
-//    let earliestTime: String
-//    let secondEarliestTime: String
     let earliestEta: [ScheduleTime]
     let isTransit: Bool
     
@@ -171,61 +167,3 @@ struct BusStopImageName: View {
         }
     }
 }
-
-//#Preview {
-//    BusStopBigSection(route: Route.all[3], busStop: BusStop.all[0], scheduleIndex: 1, startStop: true, transitStop: false) {
-//        ScheduleGrid(
-//            schedules: [
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//            ],
-//            isRoute7: true
-//        )
-//        
-//    }
-//    
-//    BusStopBigSection(route: Route.all[6], busStop: BusStop.all[5], scheduleIndex: 1, startStop: false, transitStop: true, previousRouteColor: Route.all[3].color) {
-//        ScheduleGrid(
-//            schedules: [
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isPassed: true),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15)),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//                ScheduleTime(time: timeFrom(15, 15), isRegular: false),
-//            ]
-//        )
-//    }
-//    
-//    BusStopBigSection(route: Route.all[1], busStop: BusStop.all[72], scheduleIndex: 1, startStop: false, transitStop: false) {
-//        Text("Hello")
-//    }
-//}

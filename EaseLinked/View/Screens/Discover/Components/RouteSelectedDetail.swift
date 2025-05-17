@@ -89,23 +89,6 @@ struct RouteTransitStopDetail: View {
         VStack(spacing: 0){
             BusStopBigSection(route: generatedRoutes.routes[0], busStop: generatedRoutes.busStop[0], scheduleIndex: 0, startStop: true, transitStop: false, earliestEta: generatedRoutes.twoEarliestTime) {
                 ScheduleGrid(schedules: generatedRoutes.startStopScheduleTime)
-//                ScheduleGrid(
-//                    schedules:  ScheduleDetail.getScheduleTime(
-//                        schedule: Schedule.getSchedules(by: generatedRoutes.schedulesByStop[generatedRoutes.busStop[0].id ?? ""] ?? ""),
-//                        index: 0,
-//                        busStopId: generatedRoutes.busStop[0].id
-//                    ), isRoute7: generatedRoutes.routes[0].id == "route_7"
-//                )
-//                Text("No schedule data")
-//                if let startSchedules = generatedRoutes.schedulesByStop[generatedRoutes.busStop[0].id ?? ""] {
-//                    // Display startSchedules
-//                    
-//                } else {
-//                    Text("No schedule data")
-//                }
-//                
-                
-
             }
             if !generatedRoutes.fromStartToTransit.isEmpty {
                 BusStopInBetween(color: generatedRoutes.routes[0].color, busStops: generatedRoutes.fromStartToTransit)
@@ -125,8 +108,4 @@ struct RouteTransitStopDetail: View {
             }
         }
     }
-}
-
-#Preview {
-//    RouteSelectedDetail()
 }

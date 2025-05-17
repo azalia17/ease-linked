@@ -88,7 +88,6 @@ private struct TotalRouteChip: View {
             
                 
         }
-//        .frame(width: 60)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
         .frame(width: 77)

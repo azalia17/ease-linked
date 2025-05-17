@@ -103,7 +103,3 @@ struct RouteInfoSheet: View {
         }
     }
 }
-
-#Preview {
-//    RouteInfoSheet(routes: [Route.all[0], Route.all[1]])
-}

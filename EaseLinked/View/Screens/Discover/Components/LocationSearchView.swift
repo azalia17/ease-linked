@@ -39,8 +39,8 @@ struct LocationSearchView: View {
                     },
                     swapHandler: {
                         discoverViewModel.swapDestination(
-                            start: discoverViewModel.endLocationSearch,
-                            end: discoverViewModel.startLocationSearch
+                            start: discoverViewModel.startLocationSearch,
+                            end: discoverViewModel.endLocationSearch
                         )
                     },
                     resetResultsCompletion: {
@@ -77,7 +77,7 @@ struct LocationSearchView: View {
                     }
                     .padding()
                     Rectangle()
-                        .frame(height: 4)  // Set the height (thickness) of the divider
+                        .frame(height: 4)  
                         .foregroundStyle(Color(.systemGray5))
                         .background(Color(.systemGray5))
                     Spacer()

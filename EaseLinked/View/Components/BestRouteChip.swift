@@ -31,7 +31,6 @@ struct BestRouteChip: View {
     var body: some View {
         HStack(alignment: .center, spacing: 3) {
             Image(systemName: icon)
-//                .fontSize(12)
                 .resizable()
                 .foregroundStyle(.blue)
                 .frame(width: 12, height: 11)

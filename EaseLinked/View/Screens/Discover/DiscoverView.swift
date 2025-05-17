@@ -50,7 +50,7 @@ struct DiscoverView: View {
                         Marker(identifiableCoordinate.busStopName,
                                systemImage: "bus",
                                coordinate: identifiableCoordinate.coordinate
-                        ) // Access the coordinate here
+                        )
                         .tint(discoverViewModel.selectedRoutes.routes[0].color.gradient)
                     }
                     MapPolyline(discoverViewModel.routeStartDestination!)
@@ -135,7 +135,6 @@ struct DiscoverView: View {
                         }
                         Button(
                             action: {
-                                // Your action here (e.g. center map)
                                 
                             }) {
                                 Image(systemName: "location")
@@ -179,7 +178,6 @@ struct DiscoverView: View {
                         else {
                             switch discoverViewModel.dataState {
                             case .loading:
-//                                Text("Loading...")
                                 ProgressView()
                                     .padding(.top, 40)
                             case .loaded:
@@ -274,10 +272,4 @@ struct DiscoverView: View {
         }
         
     }
-}
-
-#Preview {
-//    DiscoverView(
-//        discoverViewModel: DiscoverViewModel()
-//    )
 }

@@ -18,7 +18,6 @@ struct BusStopInBetween: View {
                 SolidLine(height: 45, color: color)
                     .overlay{
                         SolidLine(height: 48, color: color)
-//                            .offset(y: -2)
                     }
                 if isExpanded {
                     ForEach(busStops) { stop in

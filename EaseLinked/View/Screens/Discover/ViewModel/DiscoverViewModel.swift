@@ -248,45 +248,11 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
     
-//    func updateWalkingRoute(startRoute: MKRoute, endRoute: MKRoute, allRoutes: [GeneratedRoute]) {
-//        DispatchQueue.main.async {
-//            self.routeStartDestination = startRoute
-//            self.startWalkingDistance = Int(startRoute.distance)
-//            self.startWalkingTime = Int(startRoute.expectedTravelTime / 60)
-//
-//            self.routeEndDestination = endRoute
-//            self.endWalkingDistance = Int(endRoute.distance)
-//            self.endWalkingTime = Int(endRoute.expectedTravelTime / 60)
-//            
-//            self.updateBestStopAllRoutes(allRoutes: self.updateAllRoutes(allRoutes: allRoutes))
-//            self.updateDataState(.loaded)
-//        }
-//    }
-    
     func updateWalkingRoute(startRoute: MKRoute, endRoute: MKRoute, allRoutes: [GeneratedRoute]) {
         Task {
-            // 🚶‍♂️ Update walking details (this is fine on background thread)
-//            self.routeStartDestination = startRoute
-//            self.startWalkingDistance = Int(startRoute.distance)
-//            self.startWalkingTime = Int(startRoute.expectedTravelTime / 60)
-//
-//            self.routeEndDestination = endRoute
-//            self.endWalkingDistance = Int(endRoute.distance)
-//            self.endWalkingTime = Int(endRoute.expectedTravelTime / 60)
-
             updateWalkingRouteUI(startRoute: startRoute, endRoute: endRoute)
-            
-            // 🧹 Remove duplicate routes
             let cleanedRoutes = self.updateAllRoutes(allRoutes: allRoutes)
-
-            // 🧠 Compute estimated travel time
             let enrichedRoutes = await self.calculateTravelTimeForAllRoutes(cleanedRoutes)
-
-            // 🚀 Push to UI on main thread
-//            DispatchQueue.main.async {
-//                self.updateBestStopAllRoutes(allRoutes: enrichedRoutes)
-//                self.updateDataState(.loaded)
-//            }
             updateRoutesLoaded(enrichedRoutes: enrichedRoutes)
         }
     }
@@ -312,8 +278,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
 
     
     func updateBestStopAllRoutes(allRoutes: [GeneratedRoute]) {
-        var updatedRoutes = allRoutes  // Make a mutable copy
-
+        var updatedRoutes = allRoutes
+        
         for i in 0..<updatedRoutes.count {
             guard
                 updatedRoutes[i].busStop.count >= 2,
@@ -430,7 +396,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     
     func getRouteDetails(_ generatedRoute: GeneratedRoute) {
         Task {
-            // Don't update state yet; just generate coordinates directly
             let waypoints: [CLLocationCoordinate2D] = generatedRoute.busStop.map {
                 CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
             }
@@ -505,7 +470,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                         totalTime += routeResult.expectedTravelTime
                     }
                 } catch {
-                    print("❌ Route segment error: \(error.localizedDescription)")
+                    self.updateDataState(.error("Route segment error: \(error.localizedDescription)"))
                 }
             }
 
@@ -771,14 +736,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         
         self.endLocationQueryFragment = start.title
         self.endLocationSearch = start
-    }
-    
-    func extractNumber(from string: String) -> Int {
-        let components = string.split(separator: "_")
-        if let numberString = components.last, let number = Int(numberString) {
-            return number
-        }
-        return 0  // Default to 0 if the number cannot be extracted
     }
     
     func showSearchLocation() {

@@ -23,7 +23,6 @@ struct SearchCard: View {
     
     var action: () -> Void
     
-    // Define focus states
     enum Field {
         case from
         case to
@@ -163,12 +162,4 @@ struct TextFieldGrayBackgroundColor: ViewModifier {
         }
             
     }
-}
-
-#Preview {
-//    @Previewable @State var text = "yyy"
-//    @Previewable @State var text2 = ""
-//    @Previewable @State var yyy: Bool = false
-//    
-//    SearchCard(searchHandler: {}, swapHandler: {}, resetResultsCompletion: {}, startingPoint: $text, destinationPoint: $text2, activeTextField: $text, isTimePicked: $yyy, showSearchLocationView: $yyy, action: {})
 }

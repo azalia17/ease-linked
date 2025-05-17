@@ -50,10 +50,3 @@ struct RouteResultTile: View {
         .padding(.horizontal, 16)
     }
 }
-
-#Preview {
-//    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: true, bestStop: false, routes: [Route.all[1], Route.all[4]], transitAt: "The Breeze")
-//    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: false, routes: [Route.all[0], Route.all[5]], transitAt: "CBD Timur")
-//    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: true, routes: [Route.all[0], Route.all[1]], transitAt: "Lobby House of Tiktokers")
-//    RouteResultTile(eta: 25, totalBusStop: 10, bestEta: false, bestStop: true, routes: [Route.all[0]])
-}
