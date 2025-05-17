@@ -16,7 +16,13 @@ struct GeneratedRoute: Identifiable, Codable {
     var bestEta: Bool
     var bestStop: Bool
     let routes: [Route]
-    var transitAt: String = ""
+    var transitAt: String {
+        if transitBusStop.isEmpty {
+            return ""
+        } else {
+            return transitBusStop[0].name
+        }
+    }
     var startWalkingDistance: Int
     var endWalkingDistance: Int
     var startWalkingTime: Int = 0

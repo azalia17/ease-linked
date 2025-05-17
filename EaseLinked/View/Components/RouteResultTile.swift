@@ -37,7 +37,7 @@ struct RouteResultTile: View {
                 
                 RouteName(routes: routes)
                 
-                VStack(alignment: .leading, spacing: 4){
+                VStack(alignment: .leading, spacing: 6){
                     if !transitAt.isEmpty {
                         RouteSmallDetailChip(icon: "arrow.trianglehead.branch", text: "Transit at \(transitAt)")
                     }
@@ -45,6 +45,7 @@ struct RouteResultTile: View {
                     RouteSmallDetail(walkingDistance: walkingDistance, estimatedTravelTime: estimatedTravelTime,
                         eta:actualEta)
                 }
+                .padding(.bottom, 12)
             }
         }
         .padding(.horizontal, 16)

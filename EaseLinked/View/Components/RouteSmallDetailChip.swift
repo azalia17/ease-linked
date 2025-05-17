@@ -15,7 +15,7 @@ struct RouteSmallDetailChip: View {
         HStack(spacing: 4) {
             Image(systemName: icon)
                 .resizable()
-                .frame(width: 10, height: 10)
+                .frame(width: icon == "figure.walk" ? 6 : 11, height: 11)
                 .foregroundStyle(.gray)
             Text(text)
                 .font(.footnote)
