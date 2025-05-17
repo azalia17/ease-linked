@@ -35,7 +35,10 @@ struct RouteSelectedDetail: View {
                 .padding(.bottom, 14)
             PathStart(startLocation: startLocation, walkingDistance: generatedRoutes.startWalkingDistance, walkingTime: startWalkingTime)
             if generatedRoutes.routes.count > 1 {
-                RouteTransitStopDetail()
+                RouteTransitStopDetail(
+                    generatedRoutes: generatedRoutes,
+                    scheduleTime: scheduleTime
+                )
             } else {
                 RouteDirectStopsDetail(
                     generatedRoutes: generatedRoutes,
@@ -65,6 +68,7 @@ struct RouteDirectStopsDetail: View {
             }.filter{
                 $0.id != generatedRoutes.busStop[generatedRoutes.busStop.count-1].id
             })
+            
             BusStopBigSection(route: generatedRoutes.routes[0], busStop: generatedRoutes.busStop[generatedRoutes.busStop.count-1], scheduleIndex: 0, startStop: false, transitStop: false) {
                 ScheduleGrid(
                     schedules: scheduleTime, isRoute7: generatedRoutes.routes[0].id == "route_7"
@@ -75,21 +79,28 @@ struct RouteDirectStopsDetail: View {
 }
 
 struct RouteTransitStopDetail: View {
+    var generatedRoutes: GeneratedRoute
+    let scheduleTime: [ScheduleTime]
+    
     var body: some View {
-        Text("Transit Stop Detail")
-        
-        
-//            if generatedRoutes.routes.count > 2 {
-//                ForEach (1..<(generatedRoutes.routes.count-2), id: \.self) { index in
-//                    BusStopBigSection(route: generatedRoutes.routes[index], busStop: generatedRoutes.busStop.filter {
-//                        $0.routes.contains(generatedRoutes.routes[index - 1].id) && $0.routes.contains(generatedRoutes.routes[index].id)
-//                    }.first ?? BusStop.all[0], scheduleIndex: 0, startStop: false, transitStop: true, previousRouteColor: generatedRoutes.routes[index-1].color) {
-//                        ScheduleGrid(
-//                            schedules: scheduleTime, isRoute7: generatedRoutes.routes[0].id == "route_7"
-//                        )
-//                    }
-//                }
-//            }
+        VStack(spacing: 0){
+            BusStopBigSection(route: generatedRoutes.routes[0], busStop: generatedRoutes.busStop[0], scheduleIndex: 0, startStop: true, transitStop: false) {
+                ScheduleGrid(
+                    schedules: scheduleTime, isRoute7: generatedRoutes.routes[0].id == "route_7"
+                )
+            }
+            BusStopBigSection(route: generatedRoutes.routes[1], busStop: generatedRoutes.transitBusStop[0], scheduleIndex: 0, startStop: false, transitStop: true, previousRouteColor: generatedRoutes.routes[0].color) {
+                ScheduleGrid(
+                    schedules: scheduleTime, isRoute7: generatedRoutes.routes[0].id == "route_7"
+                )
+            }
+            
+            BusStopBigSection(route: generatedRoutes.routes[1], busStop: generatedRoutes.busStop[generatedRoutes.busStop.count-1], scheduleIndex: 0, startStop: false, transitStop: false) {
+                ScheduleGrid(
+                    schedules: scheduleTime, isRoute7: generatedRoutes.routes[0].id == "route_7"
+                )
+            }
+        }
     }
 }
 

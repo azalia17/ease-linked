@@ -109,5 +109,4 @@ struct RouteInfo: View {
         .navigationViewStyle(.stack)
         .padding()
     }
-    
 }

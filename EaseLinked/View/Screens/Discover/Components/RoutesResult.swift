@@ -23,9 +23,6 @@ struct RoutesResult: View {
                     transitAt: generatedRoute.transitAt
                 )
                 .onTapGesture {
-                    print("selected route: \(generatedRoute)")
-                    print("")
-                    print("selected route IDs: \(generatedRoute.routesId)")
                     action(generatedRoute)
                 }
                 .background(.white)

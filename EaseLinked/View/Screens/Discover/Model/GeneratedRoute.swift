@@ -21,11 +21,22 @@ struct GeneratedRoute: Identifiable, Codable {
     let endWalkingDistance: Int
     let estimatedTimeTravel: Int
     var busStop: [BusStop]
-//    let transitBusStop: BusStop
+//    var transitBusStop: [BusStop] = []
     
     var routesId: [String] { routes.map {$0.id} }
     var busses: [Bus] {
         Bus.getBusses(byRoutes: routesId)
+    }
+    var transitBusStop: [BusStop] {
+        if routes.count > 1 {
+            [
+                busStop.filter{$0.id != busStop[0].id}.filter { $0.routes.contains(routesId[1]) }.filter{
+                    $0.routes.contains(routesId[0])
+                }.first!
+            ]
+        } else {
+            []
+        }
     }
 }
 

@@ -60,6 +60,7 @@ struct BusSection: View {
             Text("See which bus you can take for this route")
                 .font(.headline)
                 .foregroundColor(.black)
+                .multilineTextAlignment(.leading)
         }
         
         .padding(16)

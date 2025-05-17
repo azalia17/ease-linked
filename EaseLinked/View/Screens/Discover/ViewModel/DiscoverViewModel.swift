@@ -325,8 +325,23 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             // Find minimal set of routes needed to cover the whole path
             let routeSegments: [(Route, [BusStop])] = findRouteSegments(for: path)
             
-            let combinedStops = routeSegments.flatMap { $0.1 }
+            let combinedStops : [BusStop] = routeSegments.flatMap { $0.1 }
             let usedRoutes = routeSegments.map { $0.0 }.uniqued(by: { $0.id })
+            
+//            let transitStops : [BusStop] = combinedStops.filter { $0.routes.contains(usedRoutes) }
+//            let transitStops: [BusStop] = combinedStops.filter { stop in
+//                let routesContainingStop = usedRoutes.filter { route in
+//                    route.busStops.contains(stop.id)
+//                }
+//                return routesContainingStop.count > 1
+//            }
+//            print("tansit \(transitStops)")
+            
+//            print("combinedStops \(combinedStops)")
+//            print("")
+//            print("used Routes \(usedRoutes)")
+//            print("")
+//            print("")
 
             let generated = GeneratedRoute(
                 eta: 0,
@@ -342,8 +357,13 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             
             result.append(generated)
         }
+        for res in result {
+            print("result \(res)")
+            print("")
+        }
 
         return result
+        
     }
 
     
@@ -388,81 +408,48 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     }
     
     
-    func generateBusStops(from startBusStop: BusStop, to endBusStop: BusStop, routes: [Route]) -> [BusStop]? {
-        var bestRoute: Route? = nil
-        var bestBusStops: [BusStop]? = nil
-        var minBusStopsCount = Int.max  // We will use this to track the route with the least bus stops
-
-        // Iterate over each route to find the valid routes with start and end bus stops
-        for route in routes {
-            if let startIndex = route.busStops.firstIndex(of: startBusStop.id),
-               let endIndex = route.busStops.firstIndex(of: endBusStop.id),
-               startIndex <= endIndex {
-                
-                // Get the bus stops between start and end indices (inclusive)
-                let busStopIDs = Array(route.busStops[startIndex...endIndex])
-                
-                // Convert the bus stop IDs to BusStop objects
-                let busStopsOnRoute = busStopIDs.compactMap { busStopID in
-                    return BusStop.all.first { $0.id == busStopID }
-                }
-                
-                availableRoutes.append(
-                    GeneratedRoute(eta: 0, totalBusStop: busStopsOnRoute.count, bestEta: false, bestStop: false, routes: [route], startWalkingDistance: 0, endWalkingDistance: 0, estimatedTimeTravel: 0, busStop: busStopsOnRoute)
-                )
-                
-                // Compare the count of bus stops with the current minimum
-                if busStopsOnRoute.count < minBusStopsCount {
-                    minBusStopsCount = busStopsOnRoute.count
-                    bestRoute = route  // Update the best route with the least bus stops
-                    bestBusStops = busStopsOnRoute  // Update the best route with the least bus stops
-                }
-            }
-        }
-        bestRoutes = [bestRoute ?? Route(id: "xx", name: "Xx", routeNumber: 0, busStops: [], bus: [], schedule: [], note: [], colorName: "black")]
-        
-        // Return the bus stops with the least number of stops, or nil if no valid route was found
-        return bestBusStops
-    }
+//    func generateBusStops(from startBusStop: BusStop, to endBusStop: BusStop, routes: [Route]) -> [BusStop]? {
+//        var bestRoute: Route? = nil
+//        var bestBusStops: [BusStop]? = nil
+//        var minBusStopsCount = Int.max  // We will use this to track the route with the least bus stops
+//
+//        // Iterate over each route to find the valid routes with start and end bus stops
+//        for route in routes {
+//            if let startIndex = route.busStops.firstIndex(of: startBusStop.id),
+//               let endIndex = route.busStops.firstIndex(of: endBusStop.id),
+//               startIndex <= endIndex {
+//                
+//                // Get the bus stops between start and end indices (inclusive)
+//                let busStopIDs = Array(route.busStops[startIndex...endIndex])
+//                
+//                // Convert the bus stop IDs to BusStop objects
+//                let busStopsOnRoute = busStopIDs.compactMap { busStopID in
+//                    return BusStop.all.first { $0.id == busStopID }
+//                }
+//                
+//                availableRoutes.append(
+//                    GeneratedRoute(eta: 0, totalBusStop: busStopsOnRoute.count, bestEta: false, bestStop: false, routes: [route], startWalkingDistance: 0, endWalkingDistance: 0, estimatedTimeTravel: 0, busStop: busStopsOnRoute)
+//                )
+//                
+//                // Compare the count of bus stops with the current minimum
+//                if busStopsOnRoute.count < minBusStopsCount {
+//                    minBusStopsCount = busStopsOnRoute.count
+//                    bestRoute = route  // Update the best route with the least bus stops
+//                    bestBusStops = busStopsOnRoute  // Update the best route with the least bus stops
+//                }
+//            }
+//        }
+//        bestRoutes = [bestRoute ?? Route(id: "xx", name: "Xx", routeNumber: 0, busStops: [], bus: [], schedule: [], note: [], colorName: "black")]
+//        
+//        // Return the bus stops with the least number of stops, or nil if no valid route was found
+//        return bestBusStops
+//    }
     
-    func getScheduleForInterestedStops(route: Route, schedules: [Schedule], interestedStops: [String]) -> [String: [String]] {
-        var result: [String: [String]] = [:]
-        
-        // Iterate through each schedule
-        for schedule in schedules {
-            // Check the schedule details for the interested bus stops
-            for stop in interestedStops {
-                // Filter schedule details for the current stop
-                let details = schedule.scheduleDetail.filter { $0.contains(stop) }
-                
-                // If there are matching details, merge them into the result
-                if !details.isEmpty {
-                    // If the bus stop is already in the result, append the details
-                    if result[stop] != nil {
-                        result[stop]?.append(contentsOf: details)
-                    } else {
-                        // Otherwise, create a new entry for the bus stop
-                        result[stop] = details
-                    }
-                }
-            }
-        }
-        
-        // Now, for each bus stop, sort the schedule details by the number at the end
-        for (stop, details) in result {
-            // Sort the details by the number after the last underscore
-            result[stop] = details.sorted { (first, second) -> Bool in
-                let firstNumber = extractNumber(from: first)
-                let secondNumber = extractNumber(from: second)
-                return firstNumber < secondNumber
-            }
-        }
-        
-        return result
-    }
+    
     
     func generatePathsWithTransfers(startBusStop: BusStop, endBusStop: BusStop, routes: [Route]) -> [[BusStop]] {
         var possiblePaths: [[BusStop]] = []
+//        var possiblePathsWithTransit: [[BusStop]] = []
         
         // Find transit bus stops (those that appear in multiple routes)
         let transitBusStops = BusStop.all.filter { $0.isTransitStop }
@@ -496,12 +483,24 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                         }
                         
                         possiblePaths.append(mergeWithoutDuplicate(firstPath, secondPath))
-
+                        
+//                        print("firstPart \(firstPart)")
+//                        print("firstPath \(firstPath)")
+//                        print("")
+//                        print("secondPart \(secondPart)")
+//                        print("secondPath \(secondPath)")
+//                        print("")
+                        
                     }
                 }
 
             }
         }
+//        
+//        for pos in possiblePaths {
+//            print("possiblePaths \(pos)")
+//            print("")
+//        }
         
         return possiblePaths
     }
@@ -675,6 +674,11 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         DispatchQueue.main.async {
             self.dataState = newState
         }
+    }
+    
+    func backToInitialState() {
+        self.updateViewState(.initial)
+//        self.updateDataState(.loaded)
     }
 }
 

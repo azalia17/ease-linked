@@ -31,6 +31,11 @@ struct BusStopBigSection<ExpandedContent: View>: View {
                     SolidLine(height: isExpanded ? height :  54, color: transitStop ? previousRouteColor : route.color)
                         .offset(y: 1)
                         .padding(.leading, 12)
+                        .overlay {
+                            SolidLine(height: isExpanded ? height :  54, color: transitStop ? previousRouteColor : route.color)
+                                .padding(.leading, 12)
+                                .offset(y: -4)
+                        }
                 } else {
                     SolidLine(height: 48, color: transitStop ? previousRouteColor : route.color)
                         .offset(y: 1)
@@ -46,6 +51,11 @@ struct BusStopBigSection<ExpandedContent: View>: View {
                     SolidLine(height: isExpanded ? expandedHeight + 48 : 48, color: route.color)
                         .offset(y: -1)
                         .padding(.leading, 12)
+                        .overlay {
+                            SolidLine(height: isExpanded ? expandedHeight + 48 : 48, color: route.color)
+                                .padding(.leading, 12)
+                                .offset(y: 5)
+                        }
                 } else {
                     DottedLine(height: 54)
                         .padding(.leading, 12)
@@ -113,6 +123,7 @@ struct DisclosureLabelBusStop : View {
                     .font(.subheadline)
                     .bold(true)
                     .foregroundStyle(.red)
+                    .multilineTextAlignment(.leading)
             }
             HStack(spacing: 20) {
                 BusStopImageName(images: images, busStopName: busStopName)
@@ -145,6 +156,7 @@ struct BusStopImageName: View {
                 .font(.title3)
                 .bold(true)
                 .foregroundStyle(.black)
+                .multilineTextAlignment(.leading)
             Spacer()
         }
     }

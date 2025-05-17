@@ -183,7 +183,10 @@ struct DiscoverView: View {
                                 RouteSelectedDetail(generatedRoutes: discoverViewModel.selectedRoutes, estimatedTimeSpent: 10, buses: discoverViewModel.selectedRoutes.busses, startLocation: discoverViewModel.startLocationQueryFragment, endLocation: discoverViewModel.endLocationQueryFragment, startWalkingTime: 10, endWalkingTime: 10, scheduleTime: [])
                                     .padding(.horizontal)
                                     .sheet(isPresented: $showInfoSheet) {
-                                        Text("Hello")
+                                        RouteInfoSheet(
+                                            routes: discoverViewModel.selectedRoutes.routes,
+                                            showInfo: $showInfoSheet
+                                        )
                                     }
                             case .error(let error):
                                 Text(error)
