@@ -18,7 +18,7 @@ struct SolidLine: View {
         }
         .stroke(style: StrokeStyle(lineWidth: 5))
         .foregroundColor(color)
-        .frame(width: 5, height: height)
+        .frame(width: 5, height: max(0, height))
     }
 }
 

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import MapKit
+@preconcurrency import MapKit
 
 enum DiscoverViewState {
     case initial
@@ -20,6 +20,7 @@ enum DiscoverDataState: Equatable {
     case loaded
     case error(String)
 }
+
 
 final class DiscoverViewModel : NSObject, ObservableObject {
     @Published var viewState: DiscoverViewState = .initial
@@ -373,17 +374,51 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         return allRoutes.uniqued(by: { $0.busStop.map(\.id).joined(separator: "->") })
     }
     
+//    func getRouteDetails(_ generatedRoute: GeneratedRoute) {
+//        Task {
+//            generateBusStopCoordinates(from: generatedRoute.busStop)
+//            
+//            let waypoints: [CLLocationCoordinate2D] = busStopsGenerated.map { $0.coordinate }
+//
+//            guard waypoints.count >= 2 else {
+//                self.updateDataState(.error("waypoints is less than 2"))
+//                return
+//            }
+//            
+//            var tempPolyLines: [MKPolyline] = []
+//
+//            for index in 0..<waypoints.count - 1 {
+//                let request = MKDirections.Request()
+//                request.source = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index]))
+//                request.destination = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index + 1]))
+//                request.transportType = .automobile
+//
+//                do {
+//                    let directions = try await MKDirections(request: request).calculate()
+//                    if let route = directions.routes.first {
+//                        tempPolyLines.append(route.polyline)
+//                    }
+//                } catch {
+//                    self.updateDataState(.error("Error calculating route: \(error.localizedDescription)"))
+//                }
+//            }
+//
+//            addPolyLines(tempPolyLines)
+//        }
+//    }
+    
     func getRouteDetails(_ generatedRoute: GeneratedRoute) {
         Task {
-            generateBusStopCoordinates(from: generatedRoute.busStop)
-            
-            let waypoints: [CLLocationCoordinate2D] = busStopsGenerated.map { $0.coordinate }
+            // Don't update state yet; just generate coordinates directly
+            let waypoints: [CLLocationCoordinate2D] = generatedRoute.busStop.map {
+                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+            }
 
             guard waypoints.count >= 2 else {
                 self.updateDataState(.error("waypoints is less than 2"))
                 return
             }
-            
+
             var tempPolyLines: [MKPolyline] = []
 
             for index in 0..<waypoints.count - 1 {
@@ -399,12 +434,23 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                     }
                 } catch {
                     self.updateDataState(.error("Error calculating route: \(error.localizedDescription)"))
+                    return
                 }
             }
-
-            addPolyLines(tempPolyLines)
+            updateRouteDetailUI(generatedRoute: generatedRoute, tempPolyLines: tempPolyLines)
         }
     }
+    
+    func updateRouteDetailUI(generatedRoute: GeneratedRoute, tempPolyLines: [MKPolyline]) {
+        DispatchQueue.main.async {
+            self.busStopsGenerated = generatedRoute.busStop.map {
+                IdentifiableCoordinate(coordinate: CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude), busStopName: $0.name, busStopId: $0.id)
+            }
+            self.routePolylines = tempPolyLines
+            self.updateDataState(.loaded)
+        }
+    }
+
     
     func addPolyLines(_ polyLines: [MKPolyline]) -> Void {
         DispatchQueue.main.async {
@@ -599,9 +645,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         let startRoutes = self.findRoutes(for: startBusStop)
         let endRoutes = self.findRoutes(for: endBusStop)
         
-//        getWalkingFromStopsDirections(from: startLocation, to: CLLocationCoordinate2D(latitude: startBusStop.latitude, longitude: startBusStop.longitude), type: "start")
-//        getWalkingFromStopsDirections(from: endLocation, to: CLLocationCoordinate2D(latitude: endBusStop.latitude, longitude: endBusStop.longitude), type: "end")
-//        
         // Filter routes that pass through both the start and end bus stops
         let matchingRoutes = startRoutes.filter { route in
             return endRoutes.contains { $0.id == route.id }
