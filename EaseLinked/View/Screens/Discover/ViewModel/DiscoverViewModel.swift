@@ -21,6 +21,7 @@ enum DiscoverDataState: Equatable {
     case error(String)
 }
 
+
 final class DiscoverViewModel : NSObject, ObservableObject {
     @Published var viewState: DiscoverViewState = .initial
     @Published var dataState: DiscoverDataState = .loading

@@ -11,8 +11,17 @@ import MapKit
 struct DiscoverView: View {
     @StateObject var discoverViewModel: DiscoverViewModel
     
-    var cameraPosition: MapCameraPosition = .region(.init(center: .init(latitude: -6.305968, longitude: 106.672272), latitudinalMeters: 4000, longitudinalMeters: 4000))
+    var cameraPositions: MapCameraPosition = .region(.init(center: .init(latitude: -6.305968, longitude: 106.672272), latitudinalMeters: 4000, longitudinalMeters: 4000))
     let locationManager = CLLocationManager()
+    
+    @State private var cameraPosition: MapCameraPosition = .userLocation(fallback: .region(
+        MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: -6.305968, longitude: 106.672272),
+            latitudinalMeters: 4000,
+            longitudinalMeters: 4000
+        )
+    ))
+
     
     @State private var selectedDetent: PresentationDetent = .medium
     @Binding var isPresented: Bool
@@ -21,7 +30,7 @@ struct DiscoverView: View {
     
     var body: some View {
         ZStack(alignment: .top) {
-            Map(initialPosition: cameraPosition) {
+            Map(position: $cameraPosition) {
                 UserAnnotation().tint(.blue)
                 Annotation(discoverViewModel.startLocationQueryFragment, coordinate: discoverViewModel.selectedStartCoordinate, anchor: .bottom) {
                     Image(systemName: "mappin")
@@ -116,9 +125,26 @@ struct DiscoverView: View {
                     let heightPosition = if selectedDetent == .medium || selectedDetent == .large { geometry.size.height - 420 } else {
                         geometry.size.height - 90
                     }
-                    let trailingPosition = if discoverViewModel.viewState == .result || discoverViewModel.viewState == .routeDetail { geometry.size.width - 50 } else { geometry.size.width - 30 }
+                    let trailingPosition = if discoverViewModel.viewState == .result || discoverViewModel.viewState == .routeDetail { geometry.size.width - 70 } else { geometry.size.width - 50 }
                     
                     HStack{
+                        if discoverViewModel.viewState == .routeDetail && discoverViewModel.selectedRoutes.routePolylines.count != discoverViewModel.selectedRoutes.busStop.count - 1 {
+                            Button(
+                                action: {
+                                    
+                                }) {
+                                    Image(systemName: "point.topright.arrow.triangle.backward.to.point.bottomleft.scurvepath.fill")
+                                        .font(.system(size: 16, weight: .medium))
+                                        .frame(width: 36, height: 36)
+                                        .background(.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                        .shadow(radius: 1, x: 0, y: 1)
+                                }
+                        } else {
+                            Rectangle()
+                                .frame(width: 36, height: 36)
+                                .foregroundStyle(.secondary.opacity(0.0))
+                        }
                         if discoverViewModel.viewState == .result || discoverViewModel.viewState == .routeDetail {
                             Button(
                                 action: {
@@ -135,7 +161,15 @@ struct DiscoverView: View {
                         }
                         Button(
                             action: {
-                                
+                                if let location = locationManager.location?.coordinate {
+                                    cameraPosition = .region(
+                                        MKCoordinateRegion(
+                                            center: location,
+                                            latitudinalMeters: 2000,
+                                            longitudinalMeters: 2000
+                                        )
+                                    )
+                                }
                             }) {
                                 Image(systemName: "location")
                                     .font(.system(size: 16, weight: .medium))
