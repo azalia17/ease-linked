@@ -684,12 +684,12 @@ extension ScheduleDetail {
         scheduleDetail = getManyScheduleDetails(by: scheduleDetailId).filter { $0.busStop == busStopId && $0.index == index + 1 }
         
         sTime = scheduleDetail.flatMap { $0.time }
-        print("scheduleDetail: \(scheduleDetail)")
-        
-//        sTime = getScheduleTime(schedule: scheduleDetailId, index: index + 1, busStopId: busStopId)
-        
-        print("sTime: \(sTime)")
-        print("")
+//        print("scheduleDetail: \(scheduleDetail)")
+//        
+////        sTime = getScheduleTime(schedule: scheduleDetailId, index: index + 1, busStopId: busStopId)
+//        
+//        print("sTime: \(sTime)")
+//        print("")
 
 //        for sched in scheduleDetailId {
 //            sTime = ScheduleTime.filter {$0.}

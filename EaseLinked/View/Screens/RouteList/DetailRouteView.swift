@@ -114,10 +114,3 @@ struct DetailSheet: View {
         }
     }
 }
-
-
-
-
-//#Preview {
-//    DetailRouteView(route: Route.all[0])
-//}

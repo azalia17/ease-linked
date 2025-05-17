@@ -21,9 +21,15 @@ enum DiscoverDataState: Equatable {
     case error(String)
 }
 
+enum SearchDirectionState: Equatable {
+    case wait
+    case finish
+}
+
 final class DiscoverViewModel : NSObject, ObservableObject {
     @Published var viewState: DiscoverViewState = .initial
     @Published var dataState: DiscoverDataState = .loading
+    @Published var searchState: SearchDirectionState = .wait
     
     @Published var activeTextField: String = "from"
     @Published var isTimePicked: Bool = false
@@ -48,6 +54,9 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     @Published var routeEndDestination: MKRoute?
     @Published var routeStartDestination: MKRoute?
     @Published var routePolylines: [MKPolyline] = []
+    
+    @Published var startWalkingDistance: Int = 0
+    @Published var endWalkingDistance: Int = 0
     
     @Published var bestRoutes: [Route] = []
     
@@ -95,37 +104,93 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
     
-    func searchDirection() {
+//    func searchDirection() {
+//        searchState = .wait
+//        print("1. \(searchState)")
+//        locationSearch(forLocalSearchCompletion: startLocationSearch) { response, error in
+//            if let error = error {
+//                self.updateDataState(.error("DEBUG: Location search failed with error \(error.localizedDescription)"))
+//                return
+//            }
+//            
+//            guard let item = response?.mapItems.first else {
+//                self.updateDataState(.error("startLocationSearch failed"))
+//                return
+//            }
+//            let coordinate = item.placemark.coordinate
+//            
+//            self.selectedStartCoordinate = coordinate
+//            self.searchState = .wait
+//            print("2. \(self.searchState)")
+//            
+//            if self.selectedStartCoordinate != CLLocationCoordinate2D() && self.selectedEndCoordinate == CLLocationCoordinate2D() {
+//                self.searchState = .finish
+//            }
+//        }
+//        
+//        locationSearch(forLocalSearchCompletion: endLocationSearch) { response, error in
+//            if let error = error {
+//                self.updateDataState(.error("DEBUG: Location search failed with error \(error.localizedDescription)"))
+//                return
+//            }
+//            
+//            guard let item = response?.mapItems.first else {
+//                self.updateDataState(.error("endLocationSearch failed"))
+//                return
+//            }
+//            let coordinate = item.placemark.coordinate
+//            
+//            self.selectedEndCoordinate = coordinate
+//            self.searchState = .wait
+//            print("3. \(self.searchState)")
+//            print("6. \(self.selectedEndCoordinate) | \(self.selectedStartCoordinate)")
+//            if self.selectedStartCoordinate != CLLocationCoordinate2D() && self.selectedEndCoordinate == CLLocationCoordinate2D() {
+//                self.searchState = .finish
+//            }
+//        }
+//        print("4. \(searchState)")
+//        print("5. \(selectedEndCoordinate) | \(selectedStartCoordinate)")
+//        searchState = .finish
+//    }
+    
+    func searchDirection(completion: @escaping () -> Void) {
+        let group = DispatchGroup()
+        
+        group.enter()
         locationSearch(forLocalSearchCompletion: startLocationSearch) { response, error in
             if let error = error {
-                self.updateDataState(.error("DEBUG: Location search failed with error \(error.localizedDescription)"))
+                self.updateDataState(.error("Start location search failed: \(error.localizedDescription)"))
+                group.leave()
                 return
             }
             
-            guard let item = response?.mapItems.first else {
-                self.updateDataState(.error("startLocationSearch failed"))
-                return
+            if let item = response?.mapItems.first {
+                self.selectedStartCoordinate = item.placemark.coordinate
             }
-            let coordinate = item.placemark.coordinate
-            
-            self.selectedStartCoordinate = coordinate
+            group.leave()
         }
         
+        group.enter()
         locationSearch(forLocalSearchCompletion: endLocationSearch) { response, error in
             if let error = error {
-                self.updateDataState(.error("DEBUG: Location search failed with error \(error.localizedDescription)"))
+                self.updateDataState(.error("End location search failed: \(error.localizedDescription)"))
+                group.leave()
                 return
             }
             
-            guard let item = response?.mapItems.first else {
-                self.updateDataState(.error("endLocationSearch failed"))
-                return
+            if let item = response?.mapItems.first {
+                self.selectedEndCoordinate = item.placemark.coordinate
             }
-            let coordinate = item.placemark.coordinate
-            
-            self.selectedEndCoordinate = coordinate
+            group.leave()
+        }
+        
+        group.notify(queue: .main) {
+            self.searchState = .finish
+//            print("✅ Coordinates resolved: \(self.selectedStartCoordinate) | \(self.selectedEndCoordinate)")
+            completion()
         }
     }
+
     
     func locationSearch(forLocalSearchCompletion localSearch: MKLocalSearchCompletion, completion: @escaping MKLocalSearch.CompletionHandler) {
         let searchRequest = MKLocalSearch.Request()
@@ -197,41 +262,105 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         return matchingRoutes
     }
     
+//    func getDirections() {
+//        self.updateDataState(.loading)
+//        searchDirection()
+//        
+//        if self.selectedStartCoordinate != CLLocationCoordinate2D() && self.selectedEndCoordinate == CLLocationCoordinate2D() {
+//            searchDirection()
+//        }
+//        
+//        print("print(searchState) :\(searchState)")
+//
+//        if searchState == .finish {
+//            guard self.selectedStartCoordinate.latitude != 0.0,
+//                  self.selectedStartCoordinate.longitude != 0.0,
+//                  self.selectedEndCoordinate.latitude != 0.0,
+//                  self.selectedEndCoordinate.longitude != 0.0 else {
+//                self.updateDataState(.error("Invalid coordinates, retrying once valid coordinates are available."))
+//                return
+//            }
+//
+//            Task {
+//                if let routeDetails = generateRoute(from: self.selectedStartCoordinate, to: self.selectedEndCoordinate) {
+//                    let startBusStop = routeDetails.startBusStop
+//                    let endBusStop = routeDetails.endBusStop
+//                    let routes = routeDetails.routes
+//                    
+//                    let direct = getDirectRoutes(from: startBusStop, to: endBusStop)
+//
+//                    let transferPaths = generatePathsWithTransfers(startBusStop: startBusStop, endBusStop: endBusStop, routes: routes)
+//                    let transferRoutes = convertPathsToGeneratedRoutes(paths: transferPaths)
+//
+//                    // Combine both
+//                    let allRoutes = (direct + transferRoutes)
+//                    
+//                    getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop.latitude, longitude: startBusStop.longitude), type: "start")
+//                    getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop.latitude, longitude: endBusStop.longitude), type: "end")
+//                    
+//                    print("selectedStartCoordinate \(selectedStartCoordinate)")
+//                    print("startBusStop.longitude \(startBusStop.longitude)")
+//    //                print("selectedStartCoordinate \(selectedStartCoordinate)")
+//                    print("startBusStop.latitude \(startBusStop.latitude)")
+//                    
+//                    updateBestStopAllRoutes(allRoutes: updateAllRoutes(allRoutes: allRoutes))
+//                    
+//    //                if endWalkingDistance != 0 {
+//                        self.updateDataState(.loaded)
+//    //                }
+//                } else {
+//                    self.updateDataState(.error("Could not generate a route."))
+//                }
+//                
+//            }
+//        }
+//    }
+    
     func getDirections() {
         self.updateDataState(.loading)
-        searchDirection()
-
-        guard self.selectedStartCoordinate.latitude != 0.0,
-              self.selectedStartCoordinate.longitude != 0.0,
-              self.selectedEndCoordinate.latitude != 0.0,
-              self.selectedEndCoordinate.longitude != 0.0 else {
-            self.updateDataState(.error("Invalid coordinates, retrying once valid coordinates are available."))
-            return
-        }
-
-        Task {
-            if let routeDetails = generateRoute(from: self.selectedStartCoordinate, to: self.selectedEndCoordinate) {
-                let startBusStop = routeDetails.startBusStop
-                let endBusStop = routeDetails.endBusStop
-                let routes = routeDetails.routes
-                
-                let direct = getDirectRoutes(from: startBusStop, to: endBusStop)
-
-                let transferPaths = generatePathsWithTransfers(startBusStop: startBusStop, endBusStop: endBusStop, routes: routes)
-                let transferRoutes = convertPathsToGeneratedRoutes(paths: transferPaths)
-
-                // Combine both
-                let allRoutes = (direct + transferRoutes)
-                
-                
-                updateBestStopAllRoutes(allRoutes: updateAllRoutes(allRoutes: allRoutes))
-                self.updateDataState(.loaded)
-            } else {
-                self.updateDataState(.error("Could not generate a route."))
+        
+        searchDirection {
+            guard self.selectedStartCoordinate.latitude != 0.0,
+                  self.selectedEndCoordinate.latitude != 0.0 else {
+                self.updateDataState(.error("Coordinates are not resolved."))
+                return
             }
             
+            Task {
+                if let routeDetails = self.generateRoute(from: self.selectedStartCoordinate, to: self.selectedEndCoordinate) {
+                    let startBusStop = routeDetails.startBusStop
+                    let endBusStop = routeDetails.endBusStop
+                    let routes = routeDetails.routes
+                    
+                    let direct = self.getDirectRoutes(from: startBusStop, to: endBusStop)
+
+                    let transferPaths = self.generatePathsWithTransfers(startBusStop: startBusStop, endBusStop: endBusStop, routes: routes)
+                    let transferRoutes = self.convertPathsToGeneratedRoutes(paths: transferPaths)
+
+                    // Combine both
+                    let allRoutes = (direct + transferRoutes)
+                    
+                    self.getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop.latitude, longitude: startBusStop.longitude), type: "start")
+                    self.getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop.latitude, longitude: endBusStop.longitude), type: "end")
+                    
+//                    print("selectedStartCoordinate \(selectedStartCoordinate)")
+//                    print("startBusStop.longitude \(startBusStop.longitude)")
+//    //                print("selectedStartCoordinate \(selectedStartCoordinate)")
+//                    print("startBusStop.latitude \(startBusStop.latitude)")
+                    
+                    self.updateBestStopAllRoutes(allRoutes: self.updateAllRoutes(allRoutes: allRoutes))
+                    
+                    if self.endWalkingDistance != 0 {
+                        self.updateDataState(.loaded)
+                    }
+                } else {
+                    self.updateDataState(.error("Could not generate a route."))
+                }
+                
+            }
         }
     }
+
     
     func updateBestStopAllRoutes(allRoutes: [GeneratedRoute]) {
         var updatedRoutes = allRoutes  // Make a mutable copy
@@ -252,6 +381,9 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                     break
                 }
             }
+            
+            updatedRoutes[i].startWalkingDistance = self.startWalkingDistance
+            updatedRoutes[i].endWalkingDistance = self.endWalkingDistance
         }
 
         updatedRoutes = getScheduleTimeStartStop(allRoutes: updatedRoutes)
@@ -627,8 +759,10 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         DispatchQueue.main.async {
             if (type == "start") {
                 self.routeStartDestination = directions.routes.first
+                self.startWalkingDistance = Int(directions.routes.first?.distance ?? 0.0)
             } else {
                 self.routeEndDestination = directions.routes.first
+                self.endWalkingDistance = Int(directions.routes.first?.distance ?? 0.0)
             }
         }
     }
@@ -674,7 +808,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         getDirections()
         isSheetPresented = true
         updateViewState(.result)
-        
+        updateDataState(.loading)
     }
     
     func retry() {

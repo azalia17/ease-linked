@@ -21,7 +21,8 @@ struct RoutesResult: View {
                     bestStop: generatedRoute.bestStop,
                     routes: generatedRoute.routes,
                     transitAt: generatedRoute.transitAt,
-                    actualEta: formatTime(from: generatedRoute.twoEarliestTime[0].time)
+                    actualEta: formatTime(from: generatedRoute.twoEarliestTime[0].time),
+                    walkingDistance: generatedRoute.endWalkingDistance + generatedRoute.startWalkingDistance
                 )
                 .onTapGesture {
                     action(generatedRoute)
