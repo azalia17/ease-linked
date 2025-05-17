@@ -93,9 +93,9 @@ struct RouteTransitStopDetail: View {
             if !generatedRoutes.fromStartToTransit.isEmpty {
                 BusStopInBetween(color: generatedRoutes.routes[0].color, busStops: generatedRoutes.fromStartToTransit)
             }
-            BusStopBigSection(route: generatedRoutes.routes[1], busStop: generatedRoutes.transitBusStop[0], scheduleIndex: 0, startStop: false, transitStop: true, previousRouteColor: generatedRoutes.routes[0].color, earliestEta: generatedRoutes.twoEarliestTime) {
+            BusStopBigSection(route: generatedRoutes.routes[1], busStop: generatedRoutes.transitBusStop[0], scheduleIndex: 0, startStop: false, transitStop: true, previousRouteColor: generatedRoutes.routes[0].color, earliestEta: generatedRoutes.twoEarliestTransitime) {
                 ScheduleGrid(
-                    schedules: scheduleTime, isRoute7: generatedRoutes.routes[0].id == "route_7"
+                    schedules: generatedRoutes.transitStopScheduleTime, isRoute7: generatedRoutes.routes[1].id == "route_7"
                 )
             }
             if !generatedRoutes.fromTransitToEnd.isEmpty {

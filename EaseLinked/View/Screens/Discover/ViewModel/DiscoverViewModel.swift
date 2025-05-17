@@ -279,31 +279,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         var updatedRoutes = allRoutes
         
         for i in 0..<updatedRoutes.count {
-//            guard
-//                updatedRoutes[i].busStop.count >= 2,
-//                let route = updatedRoutes[i].routes.first
-//            else { continue }
-//
-//            let fromStop = updatedRoutes[i].busStop[0].id
-//            let toStop = updatedRoutes[i].busStop[1].id
-//
-//            // Find the correct index in the route's busStops
-//            for j in 0..<(route.busStops.count - 1) {
-//                if route.busStops[j] == fromStop && route.busStops[j + 1] == toStop {
-//                    updatedRoutes[i].startStopScheduleId = j
-//                    break
-//                }
-//            }
             
             updatedRoutes[i].startStopScheduleId = getStartBusStopIndex(allRoutes: updatedRoutes[i], index: 0)
-            
-//            if updatedRoutes[i].routes.count > 1 {
-//                updatedRoutes[i].transitStopScheduleId = getTransitStopIndex(
-//                    updatedRoutes: updatedRoutes[i]
-//                )
-//            }
-//            
-//            print("transit \(updatedRoutes[i].transitStopScheduleId)")
             
             updatedRoutes[i].startWalkingDistance = self.startWalkingDistance
             updatedRoutes[i].endWalkingDistance = self.endWalkingDistance
@@ -420,17 +397,17 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         return updatedRoutes
     }
     
-    func getScheduleTimeTransitStop(allRoutes: [GeneratedRoute]) -> [GeneratedRoute] {
+    func getScheduleTimeTransitStop(allRoutes: GeneratedRoute) -> GeneratedRoute {
         var updatedRoutes = allRoutes
         
-        for i in 0..<updatedRoutes.count {
-            let scheduleUsed = updatedRoutes[i].routes[0].schedule
+//        for i in 0..<updatedRoutes.count {
+            let scheduleUsed = updatedRoutes.routes[1].schedule
             
             var scheduleTime = ScheduleDetail.getScheduleTimes(
                 schedule: scheduleUsed,
-                index: updatedRoutes[i].startStopScheduleId,
-                busStopId: updatedRoutes[i].busStop[0].id,
-                route: updatedRoutes[i].routes[0].id
+                index: updatedRoutes.transitStopScheduleId,
+                busStopId: updatedRoutes.transitBusStop[0].id,
+                route: updatedRoutes.routes[1].id
             )
             
             // ✅ Update isPassed based on current time
@@ -439,12 +416,10 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 scheduleTime[j].isPassed = scheduleTime[j].time < now
             }
             
-            updatedRoutes[i].startStopScheduleTime = scheduleTime
+            updatedRoutes.transitStopScheduleTime = scheduleTime
             
-            updatedRoutes[i].twoEarliestTime = getNextTwoTimesHandlingPassed(from: scheduleTime)
-            
-            updatedRoutes[i].eta = minutesFromNow(to: updatedRoutes[i].twoEarliestTime[0])
-        }
+            updatedRoutes.twoEarliestTransitime = getNextTwoTimesHandlingPassed(from: scheduleTime)
+//        }
         
         return updatedRoutes
     }
@@ -905,6 +880,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
         
         print("transit \(selectedRoutes.transitStopScheduleId)")
+        
+        selectedRoutes = getScheduleTimeTransitStop(allRoutes: selectedRoutes)
         
         updateRouteDetailUI(generatedRoute: selectedRoutes)
         

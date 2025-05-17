@@ -65,6 +65,7 @@ struct GeneratedRoute: Identifiable, Codable {
     }
     
     var twoEarliestTime: [ScheduleTime] = []
+    var twoEarliestTransitime: [ScheduleTime] = []
 }
 
 extension GeneratedRoute {
