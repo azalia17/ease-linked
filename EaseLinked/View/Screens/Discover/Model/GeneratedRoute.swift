@@ -32,6 +32,12 @@ struct GeneratedRoute: Identifiable, Codable {
     var transitStopScheduleId: Int = -1
     var transitStopScheduleTime: [ScheduleTime] = []
     
+    var codablePolylines: [CodablePolyline] = []
+
+    var routePolylines: [MKPolyline] {
+        codablePolylines.map { $0.mkPolyline }
+    }
+    
     var totalBusStops: Int {
         removeDuplicates(from: busStop).count
     }
@@ -87,6 +93,43 @@ extension GeneratedRoute {
         
         let slice = busStop.suffix(from: lastTransitIndex + 1).dropLast()
         return removeDuplicates(from: Array(slice))
+    }
+}
+
+struct CodablePolyline: Codable {
+    let coordinates: [CLLocationCoordinate2D]
+    
+    init(polyline: MKPolyline) {
+        self.coordinates = polyline.coordinates
+    }
+    
+    var mkPolyline: MKPolyline {
+        MKPolyline(coordinates: coordinates, count: coordinates.count)
+    }
+}
+
+
+extension MKPolyline {
+    var coordinates: [CLLocationCoordinate2D] {
+        var coords = [CLLocationCoordinate2D](repeating: kCLLocationCoordinate2DInvalid, count: pointCount)
+        getCoordinates(&coords, range: NSRange(location: 0, length: pointCount))
+        return coords
+    }
+}
+
+
+extension CLLocationCoordinate2D: Codable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        try container.encode(latitude)
+        try container.encode(longitude)
+    }
+
+    public init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        let latitude = try container.decode(CLLocationDegrees.self)
+        let longitude = try container.decode(CLLocationDegrees.self)
+        self.init(latitude: latitude, longitude: longitude)
     }
 }
 

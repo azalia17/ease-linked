@@ -394,51 +394,112 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         return allRoutes.uniqued(by: { $0.busStop.map(\.id).joined(separator: "->") })
     }
     
-    func getRouteDetails(_ generatedRoute: GeneratedRoute) {
-        Task {
-            let waypoints: [CLLocationCoordinate2D] = generatedRoute.busStop.map {
-                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-            }
-
-            guard waypoints.count >= 2 else {
-                self.updateDataState(.error("waypoints is less than 2"))
-                return
-            }
-
-            var tempPolyLines: [MKPolyline] = []
-            var totalTime: TimeInterval = 0
-
-            for index in 0..<waypoints.count - 1 {
-                let request = MKDirections.Request()
-                request.source = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index]))
-                request.destination = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index + 1]))
-                request.transportType = .automobile
-
-                do {
-                    let directions = try await MKDirections(request: request).calculate()
-                    if let route = directions.routes.first {
-                        tempPolyLines.append(route.polyline)
-                        totalTime += route.expectedTravelTime
-                    }
-                } catch {
-                    self.updateDataState(.error("Error calculating route: \(error.localizedDescription)"))
-                    return
-                }
-            }
-            
-            print(Int(totalTime / 60) + self.startWalkingTime + self.endWalkingTime)
-            updateRouteDetailUI(generatedRoute: generatedRoute, tempPolyLines: tempPolyLines, estimatedTime: Int(totalTime / 60))
-        }
-    }
+//    func getRouteDetails(_ generatedRoute: GeneratedRoute) {
+//        Task {
+//            let waypoints: [CLLocationCoordinate2D] = generatedRoute.busStop.map {
+//                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+//            }
+//
+//            guard waypoints.count >= 2 else {
+//                self.updateDataState(.error("waypoints is less than 2"))
+//                return
+//            }
+//
+//            var tempPolyLines: [MKPolyline] = []
+//            var totalTime: TimeInterval = 0
+//            
+//            
+////
+//////            for index in 0..<waypoints.count - 1 {
+//////                let request = MKDirections.Request()
+//////                request.source = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index]))
+//////                request.destination = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index + 1]))
+//////                request.transportType = .automobile
+//////
+//////                do {
+//////                    let directions = try await MKDirections(request: request).calculate()
+//////                    if let route = directions.routes.first {
+//////                        tempPolyLines.append(route.polyline)
+//////                        totalTime += route.expectedTravelTime
+//////                    }
+//////                } catch {
+//////                    self.updateDataState(.error("Error calculating route: \(error.localizedDescription)"))
+//////                    return
+//////                }
+////            
+////            for index in 0..<waypoints.count - 1 {
+////                let from = waypoints[index]
+////                let to = waypoints[index + 1]
+////                
+////                // 👇 Add the routability check here
+////                guard isRoutable(from: from, to: to) else {
+////                    print("Skipping segment too far or likely unroutable between \(from) and \(to)")
+////                    continue
+////                }
+////
+////                let request = MKDirections.Request()
+////                request.source = MKMapItem(placemark: MKPlacemark(coordinate: from))
+////                request.destination = MKMapItem(placemark: MKPlacemark(coordinate: to))
+////                request.transportType = .any
+////
+////            
+////                do {
+////                    let directions = try await MKDirections(request: request).calculate()
+////                    if let route = directions.routes.first {
+////                        tempPolyLines.append(route.polyline)
+////                        totalTime += route.expectedTravelTime
+////                    } else {
+////                        print("No route found between \(waypoints[index]) and \(waypoints[index + 1])")
+////                    }
+////                } catch {
+////                    print("Routing failed between \(waypoints[index]) and \(waypoints[index + 1]): \(error.localizedDescription)")
+////                    continue // skip this pair, don't fail the whole route
+////                }
+//////
+////            }
+//            
+////            var tempPolyLines: [MKPolyline] = []
+////            var totalTime: TimeInterval = 0
+//
+////            for index in 0..<waypoints.count - 1 {
+////                let request = MKDirections.Request()
+////                request.source = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index]))
+////                request.destination = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index + 1]))
+////                request.transportType = .automobile
+////
+////                do {
+////                    let directions = try await MKDirections(request: request).calculate()
+////                    if let route = directions.routes.first {
+////                        tempPolyLines.append(route.polyline)
+////                        totalTime += route.expectedTravelTime
+////                    }
+////                } catch {
+////                    self.updateDataState(.error("Error calculating route: \(error.localizedDescription)"))
+////                    return
+////                }
+////            }
+//
+//            // 👇 Convert MKPolyline to CodablePolyline and assign
+//            
+//
+//            
+////            print(Int(totalTime / 60) + self.startWalkingTime + self.endWalkingTime)
+//            updateRouteDetailUI(
+//                generatedRoute: generatedRoute,
+//                tempPolyLines: tempPolyLines,
+//                estimatedTime: Int(totalTime / 60)
+//            )
+//        }
+//    }
     
-    func updateRouteDetailUI(generatedRoute: GeneratedRoute, tempPolyLines: [MKPolyline], estimatedTime: Int) {
+    func updateRouteDetailUI(generatedRoute: GeneratedRoute/*, tempPolyLines: [MKPolyline], estimatedTime: Int*/) {
         DispatchQueue.main.async {
             self.busStopsGenerated = generatedRoute.busStop.map {
                 IdentifiableCoordinate(coordinate: CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude), busStopName: $0.name, busStopId: $0.id)
             }
-            self.selectedRoutes.estimatedTimeTravel = estimatedTime + self.startWalkingTime + self.endWalkingTime
-
-            self.routePolylines = tempPolyLines
+//            self.selectedRoutes.estimatedTimeTravel = estimatedTime + self.startWalkingTime + self.endWalkingTime
+//
+//            self.routePolylines = tempPolyLines
             self.updateDataState(.loaded)
         }
     }
@@ -447,6 +508,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         var updatedRoutes: [GeneratedRoute] = []
 
         for var route in routes {
+            var tempPolyLines: [MKPolyline] = []
             var totalTime: TimeInterval = 0
             let waypoints = route.busStop.map {
                 CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
@@ -467,12 +529,17 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 do {
                     let directions = try await MKDirections(request: request).calculate()
                     if let routeResult = directions.routes.first {
+                        tempPolyLines.append(routeResult.polyline)
                         totalTime += routeResult.expectedTravelTime
                     }
                 } catch {
                     self.updateDataState(.error("Route segment error: \(error.localizedDescription)"))
                 }
             }
+            
+            let codablePolylines = tempPolyLines.map { CodablePolyline(polyline: $0) }
+            route.codablePolylines = codablePolylines
+
 
             // Add walking time if available
             route.estimatedTimeTravel = Int(totalTime / 60) + self.startWalkingTime + self.endWalkingTime
@@ -714,6 +781,13 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         return route
     }
     
+    func isRoutable(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) -> Bool {
+        let distance = CLLocation(latitude: from.latitude, longitude: from.longitude)
+            .distance(from: CLLocation(latitude: to.latitude, longitude: to.longitude))
+        return distance < 50000 // ~50km, tweak as needed
+    }
+
+    
     func getNextTwoTimesHandlingPassed(from scheduleTimes: [ScheduleTime]) -> [ScheduleTime] {
         let upcoming = scheduleTimes
             .filter { !$0.isPassed }
@@ -798,7 +872,9 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         self.updateViewState(.routeDetail)
         self.updateDataState(.loading)
         selectedRoutes = generatedRoute
-        getRouteDetails(generatedRoute)
+        print("poly \(selectedRoutes.routePolylines.count)")
+        print("busstop \(selectedRoutes.busStop.count)")
+        updateRouteDetailUI(generatedRoute: generatedRoute)
     }
     
     func updateDataState(_ newState: DiscoverDataState) {

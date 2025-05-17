@@ -59,7 +59,7 @@ struct DiscoverView: View {
                     MapPolyline(discoverViewModel.routeEndDestination!)
                         .stroke(Color(.systemGray), style: StrokeStyle(lineWidth: 5, lineCap: .round,dash: [1, 8]))
                     
-                    ForEach(discoverViewModel.routePolylines, id: \.self) { polyline in
+                    ForEach(discoverViewModel.selectedRoutes.routePolylines, id: \.self) { polyline in
                         MapPolyline(polyline)
                             .stroke(discoverViewModel.selectedRoutes.routes[0].color, lineWidth: 5)
                     }
