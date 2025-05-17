@@ -207,6 +207,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         
         return matchingRoutes
     }
+    
     func getDirections() {
         self.updateDataState(.loading)
         
@@ -393,6 +394,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             }
 
             var tempPolyLines: [MKPolyline] = []
+            var totalTime: TimeInterval = 0
 
             for index in 0..<waypoints.count - 1 {
                 let request = MKDirections.Request()
@@ -404,21 +406,26 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                     let directions = try await MKDirections(request: request).calculate()
                     if let route = directions.routes.first {
                         tempPolyLines.append(route.polyline)
+                        totalTime += route.expectedTravelTime
                     }
                 } catch {
                     self.updateDataState(.error("Error calculating route: \(error.localizedDescription)"))
                     return
                 }
             }
-            updateRouteDetailUI(generatedRoute: generatedRoute, tempPolyLines: tempPolyLines)
+            
+            print(Int(totalTime / 60) + self.startWalkingTime + self.endWalkingTime)
+            updateRouteDetailUI(generatedRoute: generatedRoute, tempPolyLines: tempPolyLines, estimatedTime: Int(totalTime / 60))
         }
     }
     
-    func updateRouteDetailUI(generatedRoute: GeneratedRoute, tempPolyLines: [MKPolyline]) {
+    func updateRouteDetailUI(generatedRoute: GeneratedRoute, tempPolyLines: [MKPolyline], estimatedTime: Int) {
         DispatchQueue.main.async {
             self.busStopsGenerated = generatedRoute.busStop.map {
                 IdentifiableCoordinate(coordinate: CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude), busStopName: $0.name, busStopId: $0.id)
             }
+            self.selectedRoutes.estimatedTimeTravel = estimatedTime + self.startWalkingTime + self.endWalkingTime
+
             self.routePolylines = tempPolyLines
             self.updateDataState(.loaded)
         }
@@ -654,21 +661,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         
         return route
     }
-
-    
-//    func updateRouteDestionation(type: String, directions: MKDirections.Response) {
-//        DispatchQueue.main.async {
-//            if (type == "start") {
-//                self.routeStartDestination = directions.routes.first
-//                self.startWalkingDistance = Int(directions.routes.first?.distance ?? 0.0)
-////                self.startWalkingTime = Int((directions.routes.first?.expectedTravelTime ?? 0.0) / 60)
-//            } else {
-//                self.routeEndDestination = directions.routes.first
-//                self.endWalkingDistance = Int(directions.routes.first?.distance ?? 0.0)
-////                self.endWalkingTime = Int((directions.routes.first?.expectedTravelTime ?? 0.0) / 60)
-//            }
-//        }
-//    }
     
     func getNextTwoTimesHandlingPassed(from scheduleTimes: [ScheduleTime]) -> [ScheduleTime] {
         let upcoming = scheduleTimes

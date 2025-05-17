@@ -9,7 +9,6 @@ import SwiftUI
 
 struct RouteSelectedDetail: View {
     let generatedRoutes: GeneratedRoute
-    let estimatedTimeSpent: Int
     let buses: [Bus]
     let startLocation: String
     let endLocation: String
@@ -23,7 +22,7 @@ struct RouteSelectedDetail: View {
                 .padding(.bottom, 12)
                 .padding(.top, 10)
             
-            Text("Estimated Time Spent: \(estimatedTimeSpent) minutes")
+            Text("Estimated Time Spent: \(generatedRoutes.estimatedTimeTravel) minutes")
                 .font(.subheadline)
                 .foregroundStyle(Color(.systemGray))
                 .padding(.bottom, 28)

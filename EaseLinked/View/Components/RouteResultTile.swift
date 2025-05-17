@@ -16,6 +16,7 @@ struct RouteResultTile: View {
     var transitAt: String = ""
     let actualEta: String
     let walkingDistance: Int
+    let estimatedTravelTime: Int
     
     var body: some View {
         HStack(alignment: bestEta || bestStop ? .top : .center, spacing: 14) {
@@ -41,7 +42,7 @@ struct RouteResultTile: View {
                         RouteSmallDetailChip(icon: "arrow.trianglehead.branch", text: "Transit at \(transitAt)")
                     }
                     
-                    RouteSmallDetail(walkingDistance: walkingDistance, estimatedTravelTime: 40,
+                    RouteSmallDetail(walkingDistance: walkingDistance, estimatedTravelTime: estimatedTravelTime,
                         eta:actualEta)
                 }
             }

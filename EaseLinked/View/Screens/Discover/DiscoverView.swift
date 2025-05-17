@@ -183,7 +183,7 @@ struct DiscoverView: View {
                                 ProgressView()
                                     .padding(.top, 40)
                             case .loaded:
-                                RouteSelectedDetail(generatedRoutes: discoverViewModel.selectedRoutes, estimatedTimeSpent: 10, buses: discoverViewModel.selectedRoutes.busses, startLocation: discoverViewModel.startLocationQueryFragment, endLocation: discoverViewModel.endLocationQueryFragment, startWalkingTime: discoverViewModel.startWalkingTime, endWalkingTime: discoverViewModel.endWalkingTime, scheduleTime: [])
+                                RouteSelectedDetail(generatedRoutes: discoverViewModel.selectedRoutes, buses: discoverViewModel.selectedRoutes.busses, startLocation: discoverViewModel.startLocationQueryFragment, endLocation: discoverViewModel.endLocationQueryFragment, startWalkingTime: discoverViewModel.startWalkingTime, endWalkingTime: discoverViewModel.endWalkingTime, scheduleTime: [])
                                     .padding(.horizontal)
                                     .sheet(isPresented: $showInfoSheet) {
                                         RouteInfoSheet(
