@@ -303,71 +303,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
 
         }
     }
-
-    
-//    func updateBestStopAllRoutes(allRoutes: [GeneratedRoute]) {
-//        var updatedRoutes = allRoutes  // Make a mutable copy
-//        
-//        for i in 0..<updatedRoutes.count {
-//            guard
-//                updatedRoutes[i].busStop.count >= 2,
-//                let route = updatedRoutes[i].routes.first
-//            else { continue }
-//            
-//            let fromStop = updatedRoutes[i].busStop[0].id
-//            let toStop = updatedRoutes[i].busStop[1].id
-//            
-//            // Find the correct index in the route's busStops
-//            for j in 0..<(route.busStops.count - 1) {
-//                if route.busStops[j] == fromStop && route.busStops[j + 1] == toStop {
-//                    updatedRoutes[i].startStopScheduleId = j
-//                    break
-//                }
-//            }
-//        }
-//        
-//        updatedRoutes = getScheduleTimeStartStop(allRoutes: updatedRoutes)
-//
-//        DispatchQueue.main.async {
-//            guard !updatedRoutes.isEmpty else {
-//                self.availableRoutes = []
-//                return
-//            }
-//
-//            let sortedRoutes = updatedRoutes.sorted {
-//                if $0.totalBusStop == $1.totalBusStop {
-//                    return $0.eta < $1.eta
-//                } else {
-//                    return $0.totalBusStop < $1.totalBusStop
-//                }
-//            }
-//
-//            let bestRoute = sortedRoutes.first
-//
-//            self.availableRoutes = sortedRoutes.map { route in
-//                var updated = route
-//                updated.bestStop = (route.id == bestRoute?.id)
-//                updated.bestEta = (route.id == bestRoute?.id)
-//                return updated
-//            }
-//        }
-//    }
-
-//    func getScheduleTimeStartStop(allRoutes : [GeneratedRoute]) -> [GeneratedRoute] {
-//        var updatedRoute = allRoutes
-//        
-//        for i in 0..<updatedRoute.count {
-//            let scheduleUsed = updatedRoute[i].routes[0].schedule
-//            
-//            let scheduleTime = ScheduleDetail.getScheduleTimes(schedule: scheduleUsed, index: updatedRoute[i].startStopScheduleId, busStopId: updatedRoute[i].busStop[0].id, route: updatedRoute[i].routes[0].id)
-//            
-//            updatedRoute[i].startStopScheduleTime = scheduleTime
-//            
-//            print("")
-//        }
-//        
-//        return updatedRoute
-//    }
     
     func getScheduleTimeStartStop(allRoutes: [GeneratedRoute]) -> [GeneratedRoute] {
         var updatedRoutes = allRoutes
@@ -397,12 +332,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         
         return updatedRoutes
     }
-    
-//    func minutesFromNow(to scheduleTime: ScheduleTime) -> Int {
-//        let now = Date()
-//        let interval = scheduleTime.time.timeIntervalSince(now)
-//        return max(Int(interval / 60), 0)  // return 0 if time has already passed
-//    }
     
     //if i want the eta calculate till the next day
     func minutesFromNow(to scheduleTime: ScheduleTime) -> Int {
