@@ -55,8 +55,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     @Published var startWalkingTime: Int = 0
     @Published var endWalkingTime: Int = 0
     
-    @Published var bestRoutes: [Route] = []
-    
     var startBusStop: BusStop?
     var endBusStop: BusStop?
     
@@ -701,7 +699,74 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             return Array(scheduleTimes.sorted(by: { $0.time < $1.time }).prefix(2))
         }
     }
+    
+    func reRoute() {
+        Task {
+            var updatedRoute = selectedRoutes
 
+            var tempPolylines: [MKPolyline] = []
+            var totalTime: TimeInterval = 0
+            let waypoints = updatedRoute.busStop.map {
+                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+            }
+
+            guard waypoints.count >= 2 else {
+                self.updateDataState(.error("Not enough waypoints to regenerate route."))
+                return
+            }
+
+            for i in 0..<waypoints.count - 1 {
+                let request = MKDirections.Request()
+                request.source = MKMapItem(placemark: .init(coordinate: waypoints[i]))
+                request.destination = MKMapItem(placemark: .init(coordinate: waypoints[i + 1]))
+                request.transportType = .automobile
+
+                do {
+                    let directions = try await MKDirections(request: request).calculate()
+                    if let route = directions.routes.first {
+                        tempPolylines.append(route.polyline)
+                        totalTime += route.expectedTravelTime
+                    }
+                } catch {
+                    self.updateDataState(.error("Failed to recalculate polyline: \(error.localizedDescription)"))
+                    return
+                }
+            }
+
+            let codablePolylines = tempPolylines.map { CodablePolyline(polyline: $0) }
+            updatedRoute.codablePolylines = codablePolylines
+            updatedRoute.estimatedTimeTravel = Int(totalTime / 60) + self.startWalkingTime + self.endWalkingTime
+
+//            DispatchQueue.main.async {
+//                // Update selected route
+//                self.selectedRoutes = updatedRoute
+//                self.routePolylines = tempPolylines
+//
+//                // Update availableRoutes with new polyline/ETA
+//                if let index = self.availableRoutes.firstIndex(where: { $0.id == updatedRoute.id }) {
+//                    self.availableRoutes[index] = updatedRoute
+//                }
+//
+//                self.updateDataState(.loaded)
+//            }
+            updateReRouteUI(updatedRoute: updatedRoute, tempPolylines: tempPolylines)
+        }
+    }
+
+    func updateReRouteUI(updatedRoute: GeneratedRoute, tempPolylines: [MKPolyline]) {
+        DispatchQueue.main.async {
+            // Update selected route
+            self.selectedRoutes = updatedRoute
+            self.routePolylines = tempPolylines
+
+            // Update availableRoutes with new polyline/ETA
+            if let index = self.availableRoutes.firstIndex(where: { $0.id == updatedRoute.id }) {
+                self.availableRoutes[index] = updatedRoute
+            }
+
+            self.updateDataState(.loaded)
+        }
+    }
     
     func swapDestination(start: MKLocalSearchCompletion, end: MKLocalSearchCompletion) {
         self.startLocationQueryFragment = end.title
@@ -771,8 +836,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         self.updateViewState(.routeDetail)
         self.updateDataState(.loading)
         selectedRoutes = generatedRoute
-        print("poly \(selectedRoutes.routePolylines.count)")
-        print("busstop \(selectedRoutes.busStop.count)")
         updateRouteDetailUI(generatedRoute: generatedRoute)
     }
     
@@ -784,6 +847,31 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     
     func backToInitialState() {
         self.updateViewState(.initial)
+        self.activeTextField = "from"
+        self.isTimePicked = false
+        self.showSearchLocationView = false
+        self.isSheetPresented = false
+        self.isSearch = false
+        self.results = []
+        self.busStopData = [:]
+        self.startLocationSearch = MKLocalSearchCompletion()
+        self.endLocationSearch = MKLocalSearchCompletion()
+        self.selectedStartCoordinate = CLLocationCoordinate2D()
+        self.selectedEndCoordinate = CLLocationCoordinate2D()
+        self.route = MKRoute()
+        self.routeEndDestination =  MKRoute()
+        self.routeStartDestination =  MKRoute()
+        self.routePolylines = []
+        self.startWalkingDistance = 0
+        self.endWalkingDistance = 0
+        self.startWalkingTime = 0
+        self.endWalkingTime = 0
+        self.updateDataState(.loading)
+        self.availableRoutes = []
+        self.startLocationQueryFragment = ""
+        self.endLocationQueryFragment = ""
+        self.busStopsGenerated = []
+        self.selectedRoutes = GeneratedRoute(eta: 0, totalBusStop: 0, bestEta: false, bestStop: false, routes: Route.all, startWalkingDistance: 0, endWalkingDistance: 0, estimatedTimeTravel: 0, busStop: BusStop.all)
     }
 }
 

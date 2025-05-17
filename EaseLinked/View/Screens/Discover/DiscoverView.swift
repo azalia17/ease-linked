@@ -112,7 +112,7 @@ struct DiscoverView: View {
             case .result, .routeDetail :
                 SearchCardMinimize(
                     action: {
-                        discoverViewModel.updateViewState(.search)
+                        discoverViewModel.backToInitialState()
                     },
                     from: discoverViewModel.startLocationQueryFragment,
                     to: discoverViewModel.endLocationQueryFragment
@@ -131,7 +131,7 @@ struct DiscoverView: View {
                         if discoverViewModel.viewState == .routeDetail && discoverViewModel.selectedRoutes.routePolylines.count != discoverViewModel.selectedRoutes.busStop.count - 1 {
                             Button(
                                 action: {
-                                    
+                                    discoverViewModel.reRoute()
                                 }) {
                                     Image(systemName: "point.topright.arrow.triangle.backward.to.point.bottomleft.scurvepath.fill")
                                         .font(.system(size: 16, weight: .medium))

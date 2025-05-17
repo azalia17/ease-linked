@@ -24,7 +24,7 @@ struct LocationSearchView: View {
             VStack(alignment: .leading) {
                 Button(action: {
                     withAnimation(.spring){
-                        discoverViewModel.updateViewState(.initial)
+                        discoverViewModel.backToInitialState()
                     }
                 }) {
                     HStack {
