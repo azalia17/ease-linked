@@ -381,6 +381,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 route: updatedRoutes[i].routes[0].id
             )
             
+            scheduleTime.sort(by: { $0.time < $1.time })
+            
             // ✅ Update isPassed based on current time
             let now = Date()
             for j in 0..<scheduleTime.count {
@@ -409,6 +411,9 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 busStopId: updatedRoutes.transitBusStop[0].id,
                 route: updatedRoutes.routes[1].id
             )
+        
+        scheduleTime.sort(by: { $0.time < $1.time })
+
             
             // ✅ Update isPassed based on current time
             let now = Date()
