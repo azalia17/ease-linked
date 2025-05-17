@@ -104,55 +104,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
     
-//    func searchDirection() {
-//        searchState = .wait
-//        print("1. \(searchState)")
-//        locationSearch(forLocalSearchCompletion: startLocationSearch) { response, error in
-//            if let error = error {
-//                self.updateDataState(.error("DEBUG: Location search failed with error \(error.localizedDescription)"))
-//                return
-//            }
-//            
-//            guard let item = response?.mapItems.first else {
-//                self.updateDataState(.error("startLocationSearch failed"))
-//                return
-//            }
-//            let coordinate = item.placemark.coordinate
-//            
-//            self.selectedStartCoordinate = coordinate
-//            self.searchState = .wait
-//            print("2. \(self.searchState)")
-//            
-//            if self.selectedStartCoordinate != CLLocationCoordinate2D() && self.selectedEndCoordinate == CLLocationCoordinate2D() {
-//                self.searchState = .finish
-//            }
-//        }
-//        
-//        locationSearch(forLocalSearchCompletion: endLocationSearch) { response, error in
-//            if let error = error {
-//                self.updateDataState(.error("DEBUG: Location search failed with error \(error.localizedDescription)"))
-//                return
-//            }
-//            
-//            guard let item = response?.mapItems.first else {
-//                self.updateDataState(.error("endLocationSearch failed"))
-//                return
-//            }
-//            let coordinate = item.placemark.coordinate
-//            
-//            self.selectedEndCoordinate = coordinate
-//            self.searchState = .wait
-//            print("3. \(self.searchState)")
-//            print("6. \(self.selectedEndCoordinate) | \(self.selectedStartCoordinate)")
-//            if self.selectedStartCoordinate != CLLocationCoordinate2D() && self.selectedEndCoordinate == CLLocationCoordinate2D() {
-//                self.searchState = .finish
-//            }
-//        }
-//        print("4. \(searchState)")
-//        print("5. \(selectedEndCoordinate) | \(selectedStartCoordinate)")
-//        searchState = .finish
-//    }
-    
     func searchDirection(completion: @escaping () -> Void) {
         let group = DispatchGroup()
         
@@ -261,61 +212,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         
         return matchingRoutes
     }
-    
-//    func getDirections() {
-//        self.updateDataState(.loading)
-//        searchDirection()
-//        
-//        if self.selectedStartCoordinate != CLLocationCoordinate2D() && self.selectedEndCoordinate == CLLocationCoordinate2D() {
-//            searchDirection()
-//        }
-//        
-//        print("print(searchState) :\(searchState)")
-//
-//        if searchState == .finish {
-//            guard self.selectedStartCoordinate.latitude != 0.0,
-//                  self.selectedStartCoordinate.longitude != 0.0,
-//                  self.selectedEndCoordinate.latitude != 0.0,
-//                  self.selectedEndCoordinate.longitude != 0.0 else {
-//                self.updateDataState(.error("Invalid coordinates, retrying once valid coordinates are available."))
-//                return
-//            }
-//
-//            Task {
-//                if let routeDetails = generateRoute(from: self.selectedStartCoordinate, to: self.selectedEndCoordinate) {
-//                    let startBusStop = routeDetails.startBusStop
-//                    let endBusStop = routeDetails.endBusStop
-//                    let routes = routeDetails.routes
-//                    
-//                    let direct = getDirectRoutes(from: startBusStop, to: endBusStop)
-//
-//                    let transferPaths = generatePathsWithTransfers(startBusStop: startBusStop, endBusStop: endBusStop, routes: routes)
-//                    let transferRoutes = convertPathsToGeneratedRoutes(paths: transferPaths)
-//
-//                    // Combine both
-//                    let allRoutes = (direct + transferRoutes)
-//                    
-//                    getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop.latitude, longitude: startBusStop.longitude), type: "start")
-//                    getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop.latitude, longitude: endBusStop.longitude), type: "end")
-//                    
-//                    print("selectedStartCoordinate \(selectedStartCoordinate)")
-//                    print("startBusStop.longitude \(startBusStop.longitude)")
-//    //                print("selectedStartCoordinate \(selectedStartCoordinate)")
-//                    print("startBusStop.latitude \(startBusStop.latitude)")
-//                    
-//                    updateBestStopAllRoutes(allRoutes: updateAllRoutes(allRoutes: allRoutes))
-//                    
-//    //                if endWalkingDistance != 0 {
-//                        self.updateDataState(.loaded)
-//    //                }
-//                } else {
-//                    self.updateDataState(.error("Could not generate a route."))
-//                }
-//                
-//            }
-//        }
-//    }
-    
     func getDirections() {
         self.updateDataState(.loading)
         
@@ -342,11 +238,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                     
                     self.getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop.latitude, longitude: startBusStop.longitude), type: "start")
                     self.getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop.latitude, longitude: endBusStop.longitude), type: "end")
-                    
-//                    print("selectedStartCoordinate \(selectedStartCoordinate)")
-//                    print("startBusStop.longitude \(startBusStop.longitude)")
-//    //                print("selectedStartCoordinate \(selectedStartCoordinate)")
-//                    print("startBusStop.latitude \(startBusStop.latitude)")
                     
                     self.updateBestStopAllRoutes(allRoutes: self.updateAllRoutes(allRoutes: allRoutes))
                     
@@ -402,12 +293,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             let minEta = updatedRoutes.map { $0.eta }.min()
             let bestEtaRouteID = updatedRoutes.first(where: { $0.eta == minEta })?.id
 
-//            self.availableRoutes = updatedRoutes.map { route in
-//                var updated = route
-//                updated.bestStop = (route.id == bestStopRouteID)
-//                updated.bestEta = (route.id == bestEtaRouteID)
-//                return updated
-//            }
             
             let prioritizedRoutes = updatedRoutes.map { route -> GeneratedRoute in
                 var updated = route
