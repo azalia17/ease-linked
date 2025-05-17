@@ -30,12 +30,6 @@ extension BusStop {
         return stops
     }
     
-//    static let all: [BusStop] = [
-//             BusStop(id: "intermoda", name: "Intermoda", latitude: CLLocationCoordinate2D.intermoda.latitude, longitude: CLLocationCoordinate2D.intermoda.longitude, images: ["Intermoda_1", "Intermoda_2"], routes: ["route_1"]),
-//             BusStop(id: "bs_aeon_mall_1", name: "Aeon Mall 1", latitude: CLLocationCoordinate2D.intermoda.latitude, longitude: CLLocationCoordinate2D.intermoda.longitude, images: ["Intermoda_1", "Intermoda_2"], routes: ["route_1"]),
-//         ]
-    
-    
     static let all: [BusStop] = [
         
         BusStop(
@@ -1022,28 +1016,4 @@ extension BusStop {
         )
     ]
     
-    
-    //            static let all: [BusStop] = [
-    //                BusStop(
-    //                    id: "bs_aeon_mall_1",
-    //                    name: "AEON Mall 1",
-    //                    coordinates: .aeonMall1,
-    //                    images: [],
-    //                    routes: ["route_1"]
-    //                ),
-    //                BusStop(
-    //                    id: "intermoda",
-    //                    name: "Intermoda",
-    //                    coordinates: .aeonMall1,
-    //                    images: ["Intermoda_1", "Intermoda_2"],
-    //                    routes: ["route_1"]
-    //                ),
-    //            ]
-    //    static func getSingleStop(by id: String) -> BusStop {
-    //        return all.first(where: {$0.id == id} ?? BusStop(id: "xx", name: "xx", coordinates: CLLocationCoordinate2D(), images: [], routes: [))
-    //            }
-    //
-    //            static func getStops(by ids: [String]) -> [BusStop] {
-    //            return all.filter { $0.id ==  }
-    //        }
 }

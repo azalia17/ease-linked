@@ -13,7 +13,7 @@ struct GeneratedRoute: Identifiable, Codable {
     
     let eta: Int
     let totalBusStop: Int
-    let bestEta: Bool
+    var bestEta: Bool
     var bestStop: Bool
     let routes: [Route]
     var transitAt: String = ""
@@ -21,7 +21,8 @@ struct GeneratedRoute: Identifiable, Codable {
     let endWalkingDistance: Int
     let estimatedTimeTravel: Int
     var busStop: [BusStop]
-//    var transitBusStop: [BusStop] = []
+    
+    var schedulesByStop: [String: [String]] = [:]
     
     var totalBusStops: Int {
         removeDuplicates(from: busStop).count

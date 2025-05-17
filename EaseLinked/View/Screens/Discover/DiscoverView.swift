@@ -11,7 +11,7 @@ import MapKit
 struct DiscoverView: View {
     @StateObject var discoverViewModel: DiscoverViewModel
     
-    var cameraPosition: MapCameraPosition = .region(.init(center: .init(latitude: -6.305968, longitude: 106.672272), latitudinalMeters: 13000, longitudinalMeters: 13000))
+    var cameraPosition: MapCameraPosition = .region(.init(center: .init(latitude: -6.305968, longitude: 106.672272), latitudinalMeters: 4000, longitudinalMeters: 4000))
     let locationManager = CLLocationManager()
     
     @State private var selectedDetent: PresentationDetent = .medium
@@ -162,7 +162,8 @@ struct DiscoverView: View {
                     switch discoverViewModel.dataState {
                     case .loading:
                         VStack {
-                            Text("Loading...")
+                            ProgressView()
+                                .padding(.top, 40)
                         }
                     case .loaded:
                         if discoverViewModel.viewState == .result {
@@ -178,7 +179,9 @@ struct DiscoverView: View {
                         else {
                             switch discoverViewModel.dataState {
                             case .loading:
-                                Text("Loading...")
+//                                Text("Loading...")
+                                ProgressView()
+                                    .padding(.top, 40)
                             case .loaded:
                                 RouteSelectedDetail(generatedRoutes: discoverViewModel.selectedRoutes, estimatedTimeSpent: 10, buses: discoverViewModel.selectedRoutes.busses, startLocation: discoverViewModel.startLocationQueryFragment, endLocation: discoverViewModel.endLocationQueryFragment, startWalkingTime: 10, endWalkingTime: 10, scheduleTime: [])
                                     .padding(.horizontal)

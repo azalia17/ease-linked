@@ -233,29 +233,60 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
     
+//    func updateBestStopAllRoutes(allRoutes: [GeneratedRoute]) {
+//        DispatchQueue.main.async {
+//            // 1. Get the minimum number of bus stops across all routes
+//            guard let minBusStopCount = allRoutes.map({ $0.totalBusStops }).min() else {
+//                self.availableRoutes = []
+//                return
+//            }
+//
+//            // 2. Update each route’s `bestStop` if it has the minimum bus stops
+//            self.availableRoutes = allRoutes.map { route in
+//                var updatedRoute = route
+//                updatedRoute.bestStop = route.totalBusStops == minBusStopCount
+//                return updatedRoute
+//            }
+//        }
+//    }
+//
+    
     func updateBestStopAllRoutes(allRoutes: [GeneratedRoute]) {
         DispatchQueue.main.async {
-            // 1. Get the minimum number of bus stops across all routes
-            guard let minBusStopCount = allRoutes.map({ $0.totalBusStops }).min() else {
+            guard !allRoutes.isEmpty else {
                 self.availableRoutes = []
                 return
             }
 
-            // 2. Update each route’s `bestStop` if it has the minimum bus stops
-            self.availableRoutes = allRoutes.map { route in
-                var updatedRoute = route
-                updatedRoute.bestStop = route.totalBusStops == minBusStopCount
-                return updatedRoute
+            // 1. Sort routes by totalBusStop and eta
+            let sortedRoutes = allRoutes.sorted {
+                if $0.totalBusStop == $1.totalBusStop {
+                    return $0.eta < $1.eta  // tie-breaker: faster ETA
+                } else {
+                    return $0.totalBusStop < $1.totalBusStop
+                }
+            }
+
+            // 2. Identify best route (first in sorted list)
+            let bestRoute = sortedRoutes.first
+
+            // 3. Map and set bestStop = true and bestEta = true only for best route
+            self.availableRoutes = sortedRoutes.map { route in
+                var updated = route
+                updated.bestStop = (route.id == bestRoute?.id)
+                updated.bestEta = (route.id == bestRoute?.id)
+                return updated
             }
         }
     }
-    
+
     func updateAllRoutes(allRoutes : [GeneratedRoute]) -> [GeneratedRoute] {
-            return allRoutes.uniqued(by: { $0.busStop.map(\.id).joined(separator: "->") })
+        return allRoutes.uniqued(by: { $0.busStop.map(\.id).joined(separator: "->") })
     }
     
-    func getRouteDetails(_ generatedRoute: GeneratedRoute) -> Void {
+    func getRouteDetails(_ generatedRoute: GeneratedRoute) {
         Task {
+            // Compute walking routes
             getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop!.latitude, longitude: startBusStop!.longitude), type: "start")
             
             getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop!.latitude, longitude: endBusStop!.longitude), type: "end")
@@ -263,20 +294,20 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             generateBusStopCoordinates(from: generatedRoute.busStop)
             
             let waypoints: [CLLocationCoordinate2D] = busStopsGenerated.map { $0.coordinate }
-            
+
             guard waypoints.count >= 2 else {
                 self.updateDataState(.error("waypoints is less than 2"))
                 return
             }
             
             var tempPolyLines: [MKPolyline] = []
-            
+
             for index in 0..<waypoints.count - 1 {
                 let request = MKDirections.Request()
                 request.source = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index]))
                 request.destination = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index + 1]))
                 request.transportType = .automobile
-                
+
                 do {
                     let directions = try await MKDirections(request: request).calculate()
                     if let route = directions.routes.first {
@@ -286,10 +317,91 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                     self.updateDataState(.error("Error calculating route: \(error.localizedDescription)"))
                 }
             }
-            
+
             addPolyLines(tempPolyLines)
+
+            // 🟨 Assign schedule info
+            let allSchedules = Schedule.all
+            let route = generatedRoute.routes.first! // for now we assume route[0]
+
+            var stopsOfInterest = [startBusStop?.id].compactMap { $0 }
+
+            if let transit = generatedRoute.transitBusStop.first {
+                stopsOfInterest.append(transit.id)
+            }
+
+            let schedulesForStops = getScheduleForInterestedStops(route: route, schedules: allSchedules, interestedStops: stopsOfInterest)
+
+//            DispatchQueue.main.async {
+//                self.
+                selectedRoutes.schedulesByStop = schedulesForStops
+//            }
+            for sched in schedulesForStops {
+                print("sched \(sched)")
+                print("")
+            }
         }
     }
+
+    func getScheduleForInterestedStops(route: Route, schedules: [Schedule], interestedStops: [String]) -> [String: [String]] {
+        var result: [String: [String]] = [:]
+
+        for schedule in schedules {
+            for stop in interestedStops {
+                let details = schedule.scheduleDetail.filter { $0.contains(stop) }
+
+                if !details.isEmpty {
+                    result[stop, default: []].append(contentsOf: details)
+                }
+            }
+        }
+
+        for (stop, details) in result {
+            result[stop] = details.sorted {
+                extractNumber(from: $0) < extractNumber(from: $1)
+            }
+        }
+
+        return result
+    }
+
+    
+//    func getRouteDetails(_ generatedRoute: GeneratedRoute) -> Void {
+//        Task {
+//            getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop!.latitude, longitude: startBusStop!.longitude), type: "start")
+//            
+//            getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop!.latitude, longitude: endBusStop!.longitude), type: "end")
+//            
+//            generateBusStopCoordinates(from: generatedRoute.busStop)
+//            
+//            let waypoints: [CLLocationCoordinate2D] = busStopsGenerated.map { $0.coordinate }
+//            
+//            guard waypoints.count >= 2 else {
+//                self.updateDataState(.error("waypoints is less than 2"))
+//                return
+//            }
+//            
+//            var tempPolyLines: [MKPolyline] = []
+//            
+//            for index in 0..<waypoints.count - 1 {
+//                let request = MKDirections.Request()
+//                request.source = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index]))
+//                request.destination = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index + 1]))
+//                request.transportType = .automobile
+//                
+//                do {
+//                    let directions = try await MKDirections(request: request).calculate()
+//                    if let route = directions.routes.first {
+//                        tempPolyLines.append(route.polyline)
+//                    }
+//                } catch {
+//                    self.updateDataState(.error("Error calculating route: \(error.localizedDescription)"))
+//                }
+//            }
+//            
+//            addPolyLines(tempPolyLines)
+//        }
+//    }
     
     func addPolyLines(_ polyLines: [MKPolyline]) -> Void {
         DispatchQueue.main.async {
