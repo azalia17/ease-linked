@@ -233,44 +233,43 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
     
-//    func updateBestStopAllRoutes(allRoutes: [GeneratedRoute]) {
-//        DispatchQueue.main.async {
-//            // 1. Get the minimum number of bus stops across all routes
-//            guard let minBusStopCount = allRoutes.map({ $0.totalBusStops }).min() else {
-//                self.availableRoutes = []
-//                return
-//            }
-//
-//            // 2. Update each route’s `bestStop` if it has the minimum bus stops
-//            self.availableRoutes = allRoutes.map { route in
-//                var updatedRoute = route
-//                updatedRoute.bestStop = route.totalBusStops == minBusStopCount
-//                return updatedRoute
-//            }
-//        }
-//    }
-//
-    
     func updateBestStopAllRoutes(allRoutes: [GeneratedRoute]) {
+        var updatedRoutes = allRoutes  // Make a mutable copy
+        
+        for i in 0..<updatedRoutes.count {
+            guard
+                updatedRoutes[i].busStop.count >= 2,
+                let route = updatedRoutes[i].routes.first
+            else { continue }
+            
+            let fromStop = updatedRoutes[i].busStop[0].id
+            let toStop = updatedRoutes[i].busStop[1].id
+            
+            // Find the correct index in the route's busStops
+            for j in 0..<(route.busStops.count - 1) {
+                if route.busStops[j] == fromStop && route.busStops[j + 1] == toStop {
+                    updatedRoutes[i].startStopScheduleId = j
+                    break
+                }
+            }
+        }
+
         DispatchQueue.main.async {
-            guard !allRoutes.isEmpty else {
+            guard !updatedRoutes.isEmpty else {
                 self.availableRoutes = []
                 return
             }
 
-            // 1. Sort routes by totalBusStop and eta
-            let sortedRoutes = allRoutes.sorted {
+            let sortedRoutes = updatedRoutes.sorted {
                 if $0.totalBusStop == $1.totalBusStop {
-                    return $0.eta < $1.eta  // tie-breaker: faster ETA
+                    return $0.eta < $1.eta
                 } else {
                     return $0.totalBusStop < $1.totalBusStop
                 }
             }
 
-            // 2. Identify best route (first in sorted list)
             let bestRoute = sortedRoutes.first
 
-            // 3. Map and set bestStop = true and bestEta = true only for best route
             self.availableRoutes = sortedRoutes.map { route in
                 var updated = route
                 updated.bestStop = (route.id == bestRoute?.id)
@@ -278,7 +277,14 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 return updated
             }
         }
+        
+//        for r in availableRoutes {
+//            print("availble route \(r.routes) ")
+//            print("index \(r.startStopScheduleId)")
+//            print("")
+//        }
     }
+
 
     func updateAllRoutes(allRoutes : [GeneratedRoute]) -> [GeneratedRoute] {
         return allRoutes.uniqued(by: { $0.busStop.map(\.id).joined(separator: "->") })
@@ -330,16 +336,35 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 stopsOfInterest.append(transit.id)
             }
 
-            let schedulesForStops = getScheduleForInterestedStops(route: route, schedules: allSchedules, interestedStops: stopsOfInterest)
+//            let schedulesForStops = getScheduleForInterestedStops(route: route, schedules: allSchedules, interestedStops: stopsOfInterest)
+            
+//            print(Schedule.getGroupedScheduleTimesByBusStop(for: generatedRoute.routes[0]))
+//            let grouped = Schedule.getGroupedScheduleTimesByBusStop(for: generatedRoute.routes[0])
+//
+//            // Example output:
+//            for (busStopId, items) in grouped {
+//                print("🚌 \(busStopId)")
+//                for (index, time) in items {
+//                    print(" - Index \(index): \(time.time)")
+//                }
+//            }
+//            
+//            for i in 0..<(generatedRoute.routes[0].busStops.count - 1) {
+//                if generatedRoute.routes[0].busStops[i] == generatedRoute.busStop[0].id && generatedRoute.routes[0].busStops[i + 1] == generatedRoute.busStop[1].id {
+////                    print("Found '\(generatedRoute.busStop[0].name)' at index \(i), followed by '\(generatedRoute.busStop[1].name)'")
+//                    generatedRoute.startStopScheduleId = i
+//                    break
+//                }
+//            }
 
 //            DispatchQueue.main.async {
 //                self.
-                selectedRoutes.schedulesByStop = schedulesForStops
+//                selectedRoutes.schedulesByStop = schedulesForStops
 //            }
-            for sched in schedulesForStops {
-                print("sched \(sched)")
-                print("")
-            }
+//            for sched in schedulesForStops {
+//                print("sched \(sched)")
+//                print("")
+//            }
         }
     }
 
@@ -471,10 +496,10 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             
             result.append(generated)
         }
-        for res in result {
-            print("result \(res)")
-            print("")
-        }
+//        for res in result {
+//            print("result \(res)")
+//            print("")
+//        }
 
         return result
         

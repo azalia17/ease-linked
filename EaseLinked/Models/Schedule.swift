@@ -700,3 +700,41 @@ func load<T: Decodable>(_ filename: String) -> T {
         fatalError("Couldn't parse \(filename) as \(T.self):\n\(error)")
     }
 }
+
+extension Schedule {
+    static func getGroupedScheduleTimesByBusStop(for route: Route) -> [String: [(index: Int, time: ScheduleTime)]] {
+        var result: [String: [(index: Int, time: ScheduleTime)]] = [:]
+        
+        // Get all matching schedules for the route
+        let matchingSchedules = Schedule.all.filter { route.schedule.contains($0.id) }
+        
+        // Get all ScheduleDetail IDs from those schedules
+        let allDetailIDs = matchingSchedules.flatMap { $0.scheduleDetail }
+        
+        // Get full ScheduleDetail objects
+        let allScheduleDetails = ScheduleDetail.getManyScheduleDetails(by: allDetailIDs)
+        
+        // Go through all schedule details
+        for detail in allScheduleDetails {
+            let busStopId = detail.busStop
+            let stopIndex = detail.index
+            
+            for time in detail.time {
+                result[busStopId, default: []].append((index: stopIndex, time: time))
+            }
+        }
+
+        // Optional: sort the times for each bus stop based on index and time
+        for (busStopId, times) in result {
+            result[busStopId] = times.sorted {
+                if $0.index == $1.index {
+                    return $0.time.time < $1.time.time
+                } else {
+                    return $0.index < $1.index
+                }
+            }
+        }
+        
+        return result
+    }
+}

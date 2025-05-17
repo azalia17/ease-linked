@@ -24,6 +24,8 @@ struct GeneratedRoute: Identifiable, Codable {
     
     var schedulesByStop: [String: [String]] = [:]
     
+    var startStopScheduleId: Int = 0
+    
     var totalBusStops: Int {
         removeDuplicates(from: busStop).count
     }
