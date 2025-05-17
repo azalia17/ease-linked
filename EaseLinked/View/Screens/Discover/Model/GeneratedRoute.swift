@@ -11,7 +11,7 @@ import MapKit
 struct GeneratedRoute: Identifiable, Codable {
     var id = UUID()
     
-    let eta: Int
+    var eta: Int
     let totalBusStop: Int
     var bestEta: Bool
     var bestStop: Bool
@@ -49,6 +49,8 @@ struct GeneratedRoute: Identifiable, Codable {
             []
         }
     }
+    
+    var twoEarliestTime: [ScheduleTime] = []
 }
 
 extension GeneratedRoute {

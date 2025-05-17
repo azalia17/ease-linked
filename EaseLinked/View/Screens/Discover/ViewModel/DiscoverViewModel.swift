@@ -281,21 +281,70 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
 
-    func getScheduleTimeStartStop(allRoutes : [GeneratedRoute]) -> [GeneratedRoute] {
-        var updatedRoute = allRoutes
+//    func getScheduleTimeStartStop(allRoutes : [GeneratedRoute]) -> [GeneratedRoute] {
+//        var updatedRoute = allRoutes
+//        
+//        for i in 0..<updatedRoute.count {
+//            let scheduleUsed = updatedRoute[i].routes[0].schedule
+//            
+//            let scheduleTime = ScheduleDetail.getScheduleTimes(schedule: scheduleUsed, index: updatedRoute[i].startStopScheduleId, busStopId: updatedRoute[i].busStop[0].id, route: updatedRoute[i].routes[0].id)
+//            
+//            updatedRoute[i].startStopScheduleTime = scheduleTime
+//            
+//            print("")
+//        }
+//        
+//        return updatedRoute
+//    }
+    
+    func getScheduleTimeStartStop(allRoutes: [GeneratedRoute]) -> [GeneratedRoute] {
+        var updatedRoutes = allRoutes
         
-        for i in 0..<updatedRoute.count {
-            let scheduleUsed = updatedRoute[i].routes[0].schedule
+        for i in 0..<updatedRoutes.count {
+            let scheduleUsed = updatedRoutes[i].routes[0].schedule
             
-            let scheduleTime = ScheduleDetail.getScheduleTimes(schedule: scheduleUsed, index: updatedRoute[i].startStopScheduleId, busStopId: updatedRoute[i].busStop[0].id, route: updatedRoute[i].routes[0].id)
+            var scheduleTime = ScheduleDetail.getScheduleTimes(
+                schedule: scheduleUsed,
+                index: updatedRoutes[i].startStopScheduleId,
+                busStopId: updatedRoutes[i].busStop[0].id,
+                route: updatedRoutes[i].routes[0].id
+            )
             
-            updatedRoute[i].startStopScheduleTime = scheduleTime
+            // ✅ Update isPassed based on current time
+            let now = Date()
+            for j in 0..<scheduleTime.count {
+                scheduleTime[j].isPassed = scheduleTime[j].time < now
+            }
             
-            print("")
+            updatedRoutes[i].startStopScheduleTime = scheduleTime
+            
+            updatedRoutes[i].twoEarliestTime = getNextTwoTimesHandlingPassed(from: scheduleTime)
+            
+            updatedRoutes[i].eta = minutesFromNow(to: updatedRoutes[i].twoEarliestTime[0])
         }
         
-        return updatedRoute
+        return updatedRoutes
     }
+    
+//    func minutesFromNow(to scheduleTime: ScheduleTime) -> Int {
+//        let now = Date()
+//        let interval = scheduleTime.time.timeIntervalSince(now)
+//        return max(Int(interval / 60), 0)  // return 0 if time has already passed
+//    }
+    
+    //if i want the eta calculate till the next day
+    func minutesFromNow(to scheduleTime: ScheduleTime) -> Int {
+        let now = Date()
+        var time = scheduleTime.time
+
+        if time < now {
+            time = Calendar.current.date(byAdding: .day, value: 1, to: time)!
+        }
+
+        let interval = time.timeIntervalSince(now)
+        return Int(interval / 60)
+    }
+
 
     func updateAllRoutes(allRoutes : [GeneratedRoute]) -> [GeneratedRoute] {
         return allRoutes.uniqued(by: { $0.busStop.map(\.id).joined(separator: "->") })
@@ -583,6 +632,20 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
     
+    func getNextTwoTimesHandlingPassed(from scheduleTimes: [ScheduleTime]) -> [ScheduleTime] {
+        let upcoming = scheduleTimes
+            .filter { !$0.isPassed }
+            .sorted(by: { $0.time < $1.time })
+
+        if upcoming.count >= 2 {
+            return Array(upcoming.prefix(2))
+        } else if upcoming.count == 1 {
+            return [upcoming[0]] + scheduleTimes.sorted(by: { $0.time < $1.time }).prefix(1)
+        } else {
+            // All have passed — return the first two sorted by time
+            return Array(scheduleTimes.sorted(by: { $0.time < $1.time }).prefix(2))
+        }
+    }
 
     
     func swapDestination(start: MKLocalSearchCompletion, end: MKLocalSearchCompletion) {

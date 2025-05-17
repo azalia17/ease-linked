@@ -42,7 +42,11 @@ struct ScheduleItem: View {
         self.isPassed = isPassed
         
         self.color = if (self.isPassed) {
-            Color(.systemGray3)
+            if self.isRegular {
+                Color(.systemGray3)
+            } else {
+                Color(.red).opacity(0.3)
+            }
         } else if (self.isRegular) {
             Color.black
         } else {
@@ -59,7 +63,7 @@ struct ScheduleItem: View {
             if !isRegular {
                 Text("*")
                     .font(.title)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(color)
             }
         }
         .frame(height: 21)

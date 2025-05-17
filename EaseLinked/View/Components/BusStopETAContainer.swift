@@ -32,7 +32,7 @@ private struct EtaChip: View {
                 .foregroundColor(.white)
             if bestEta {
                 VStack(spacing: 2) {
-                    Text("\(eta)")
+                    Text(eta > 100 ? "-" : "\(eta)")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -41,8 +41,8 @@ private struct EtaChip: View {
                         .foregroundColor(.white)
                 }
             } else {
-                HStack(alignment: .bottom, spacing: 2) {
-                    Text("\(eta)")
+                HStack(alignment: eta > 100 ? .center : .bottom, spacing: 2) {
+                    Text(eta > 100 ? "-" : "\(eta)")
                         .font(.body)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -52,10 +52,7 @@ private struct EtaChip: View {
                             .foregroundColor(.white)
                 }
             }
-            
-                
         }
-//        .frame(width: 60)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
         .frame(width: 77)
