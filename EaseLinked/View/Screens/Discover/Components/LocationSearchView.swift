@@ -60,29 +60,12 @@ struct LocationSearchView: View {
                 ListOfLocation(discoverViewModel: discoverViewModel)
             } else {
                 VStack(alignment: .leading, spacing: 0) {
-                    HStack {
-                        Image(systemName: "location.circle.fill")
-                            .resizable()
-                            .foregroundColor(.blue)
-                            .accentColor(.white)
-                            .frame(width: 40, height: 40)
-                        
-                        VStack(alignment: .leading) {
-                            Text("Your Location")
-                                .font(.body)
-                                .bold()
-                        }
-                        .padding(.leading, 8)
-                        .padding(.vertical, 8)
-                    }
-                    .padding()
-                    Rectangle()
-                        .frame(height: 4)  
-                        .foregroundStyle(Color(.systemGray5))
-                        .background(Color(.systemGray5))
+                    Text("Start Typing and click on a location")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .padding(.top, 20)
                     Spacer()
                 }
-                .background(.white)
             }
         }
         .background(.white)

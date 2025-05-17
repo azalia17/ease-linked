@@ -23,17 +23,17 @@ struct BusStopBigSection<ExpandedContent: View>: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 0){
-                let height = expandedHeight/2 - 10
+//                let height = expandedHeight/2 - 10
                 
                 if startStop {
                     DottedLine(height: 54)
                         .padding(.leading, 12)
                 } else if transitStop {
-                    SolidLine(height: isExpanded ? height :  54, color: transitStop ? previousRouteColor : route.color)
+                    SolidLine(height: 66, color: transitStop ? previousRouteColor : route.color)
                         .offset(y: 1)
                         .padding(.leading, 12)
                         .overlay {
-                            SolidLine(height: isExpanded ? height :  54, color: transitStop ? previousRouteColor : route.color)
+                            SolidLine(height: 66, color: transitStop ? previousRouteColor : route.color)
                                 .padding(.leading, 12)
                                 .offset(y: -4)
                         }

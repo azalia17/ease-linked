@@ -882,11 +882,10 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             selectedRoutes.transitStopScheduleId = getTransitStopIndex(
                 updatedRoutes: selectedRoutes
             )
+            print("transit \(selectedRoutes.transitStopScheduleId)")
+            
+            selectedRoutes = getScheduleTimeTransitStop(allRoutes: selectedRoutes)
         }
-        
-        print("transit \(selectedRoutes.transitStopScheduleId)")
-        
-        selectedRoutes = getScheduleTimeTransitStop(allRoutes: selectedRoutes)
         
         updateRouteDetailUI(generatedRoute: selectedRoutes)
         
