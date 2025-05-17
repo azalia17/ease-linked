@@ -36,7 +36,7 @@ struct RouteSelectedDetail: View {
                 .bold(true)
                 .foregroundStyle(.black)
                 .padding(.bottom, 14)
-            PathStart(startLocation: startLocation, walkingDistance: generatedRoutes.startWalkingDistance, walkingTime: startWalkingTime)
+            PathStart(startLocation: startLocation, walkingDistance: generatedRoutes.startWalkingDistance, walkingTime: generatedRoutes.startWalkingTime)
             
             if generatedRoutes.routes.count > 1 {
                 RouteTransitStopDetail(
@@ -49,7 +49,7 @@ struct RouteSelectedDetail: View {
                     scheduleTime: scheduleTime
                 )
             }
-            PathEnd(endLocation: endLocation, walkingDistance: generatedRoutes.endWalkingDistance, walkingTime: endWalkingTime)
+            PathEnd(endLocation: endLocation, walkingDistance: generatedRoutes.endWalkingDistance, walkingTime: generatedRoutes.endWalkingTime)
         }
         .padding(.bottom, 40)
         

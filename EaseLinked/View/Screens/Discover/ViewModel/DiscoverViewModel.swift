@@ -255,7 +255,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
 
             self.routeEndDestination = endRoute
             self.endWalkingDistance = Int(endRoute.distance)
-            self.endWalkingTime = Int(startRoute.expectedTravelTime / 60)
+            self.endWalkingTime = Int(endRoute.expectedTravelTime / 60)
             
             self.updateBestStopAllRoutes(allRoutes: self.updateAllRoutes(allRoutes: allRoutes))
             self.updateDataState(.loaded)

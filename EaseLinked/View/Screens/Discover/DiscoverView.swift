@@ -210,7 +210,7 @@ struct DiscoverView: View {
                                     .font(.title3)
                                     .bold()
                             } else {
-                                JourneyTile(startWalkingTime: discoverViewModel.startWalkingTime, startStop: discoverViewModel.selectedRoutes.busStop[0].name, endStop: discoverViewModel.selectedRoutes.busStop[discoverViewModel.selectedRoutes.busStop.count - 1].name, endWalkingTime: discoverViewModel.endWalkingTime)
+                                JourneyTile(startWalkingTime: discoverViewModel.selectedRoutes.startWalkingTime, startStop: discoverViewModel.selectedRoutes.busStop[0].name, endStop: discoverViewModel.selectedRoutes.busStop[discoverViewModel.selectedRoutes.busStop.count - 1].name, endWalkingTime: discoverViewModel.selectedRoutes.endWalkingTime)
                             }
                         }
                         
