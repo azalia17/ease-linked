@@ -21,15 +21,9 @@ enum DiscoverDataState: Equatable {
     case error(String)
 }
 
-enum SearchDirectionState: Equatable {
-    case wait
-    case finish
-}
-
 final class DiscoverViewModel : NSObject, ObservableObject {
     @Published var viewState: DiscoverViewState = .initial
     @Published var dataState: DiscoverDataState = .loading
-    @Published var searchState: SearchDirectionState = .wait
     
     @Published var activeTextField: String = "from"
     @Published var isTimePicked: Bool = false
@@ -136,8 +130,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
         
         group.notify(queue: .main) {
-            self.searchState = .finish
-//            print("✅ Coordinates resolved: \(self.selectedStartCoordinate) | \(self.selectedEndCoordinate)")
             completion()
         }
     }
@@ -222,33 +214,84 @@ final class DiscoverViewModel : NSObject, ObservableObject {
                 return
             }
             
+//            Task {
+//                if let routeDetails = self.generateRoute(from: self.selectedStartCoordinate, to: self.selectedEndCoordinate) {
+//                    let startBusStop = routeDetails.startBusStop
+//                    let endBusStop = routeDetails.endBusStop
+//                    let routes = routeDetails.routes
+//                    
+//                    let direct = self.getDirectRoutes(from: startBusStop, to: endBusStop)
+//
+//                    let transferPaths = self.generatePathsWithTransfers(startBusStop: startBusStop, endBusStop: endBusStop, routes: routes)
+//                    let transferRoutes = self.convertPathsToGeneratedRoutes(paths: transferPaths)
+//
+//                    // Combine both
+//                    let allRoutes = (direct + transferRoutes)
+//                    
+//                    self.getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop.latitude, longitude: startBusStop.longitude), type: "start")
+//                    self.getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop.latitude, longitude: endBusStop.longitude), type: "end")
+//                    
+//                    self.updateBestStopAllRoutes(allRoutes: self.updateAllRoutes(allRoutes: allRoutes))
+//                    
+//                    if self.endWalkingDistance != 0 {
+//                        self.updateDataState(.loaded)
+//                    }
+//                } else {
+//                    self.updateDataState(.error("Could not generate a route."))
+//                }
+//                
+//            }
             Task {
                 if let routeDetails = self.generateRoute(from: self.selectedStartCoordinate, to: self.selectedEndCoordinate) {
                     let startBusStop = routeDetails.startBusStop
                     let endBusStop = routeDetails.endBusStop
                     let routes = routeDetails.routes
-                    
-                    let direct = self.getDirectRoutes(from: startBusStop, to: endBusStop)
 
+                    let direct = self.getDirectRoutes(from: startBusStop, to: endBusStop)
                     let transferPaths = self.generatePathsWithTransfers(startBusStop: startBusStop, endBusStop: endBusStop, routes: routes)
                     let transferRoutes = self.convertPathsToGeneratedRoutes(paths: transferPaths)
 
-                    // Combine both
                     let allRoutes = (direct + transferRoutes)
-                    
-                    self.getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop.latitude, longitude: startBusStop.longitude), type: "start")
-                    self.getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop.latitude, longitude: endBusStop.longitude), type: "end")
-                    
-                    self.updateBestStopAllRoutes(allRoutes: self.updateAllRoutes(allRoutes: allRoutes))
-                    
-                    if self.endWalkingDistance != 0 {
-                        self.updateDataState(.loaded)
+
+                    do {
+                        let startRoute = try await self.getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop.latitude, longitude: startBusStop.longitude))
+                        let endRoute = try await self.getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop.latitude, longitude: endBusStop.longitude))
+
+//                        DispatchQueue.main.async {
+//                            self.routeStartDestination = startRoute
+//                            self.startWalkingDistance = Int(startRoute.distance)
+//
+//                            self.routeEndDestination = endRoute
+//                            self.endWalkingDistance = Int(endRoute.distance)
+//                        }
+                        
+                        self.updateWalkingRoute(startRoute: startRoute, endRoute: endRoute, allRoutes: allRoutes)
+
+//                        self.updateBestStopAllRoutes(allRoutes: self.updateAllRoutes(allRoutes: allRoutes))
+//                        self.updateDataState(.loaded)
+
+                    } catch {
+                        self.updateDataState(.error("Failed to calculate walking directions"))
                     }
+
                 } else {
                     self.updateDataState(.error("Could not generate a route."))
                 }
-                
             }
+
+        }
+    }
+    
+    func updateWalkingRoute(startRoute: MKRoute, endRoute: MKRoute, allRoutes: [GeneratedRoute]) {
+        DispatchQueue.main.async {
+            self.routeStartDestination = startRoute
+            self.startWalkingDistance = Int(startRoute.distance)
+
+            self.routeEndDestination = endRoute
+            self.endWalkingDistance = Int(endRoute.distance)
+            
+            self.updateBestStopAllRoutes(allRoutes: self.updateAllRoutes(allRoutes: allRoutes))
+            self.updateDataState(.loaded)
         }
     }
 
@@ -371,9 +414,9 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     func getRouteDetails(_ generatedRoute: GeneratedRoute) {
         Task {
             // Compute walking routes
-            getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop!.latitude, longitude: startBusStop!.longitude), type: "start")
-            
-            getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop!.latitude, longitude: endBusStop!.longitude), type: "end")
+//            getWalkingFromStopsDirections(from: self.selectedStartCoordinate, to: CLLocationCoordinate2D(latitude: startBusStop!.latitude, longitude: startBusStop!.longitude), type: "start")
+//            
+//            getWalkingFromStopsDirections(from: self.selectedEndCoordinate, to: CLLocationCoordinate2D(latitude: endBusStop!.latitude, longitude: endBusStop!.longitude), type: "end")
             
             generateBusStopCoordinates(from: generatedRoute.busStop)
             
@@ -599,9 +642,9 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         let startRoutes = self.findRoutes(for: startBusStop)
         let endRoutes = self.findRoutes(for: endBusStop)
         
-        getWalkingFromStopsDirections(from: startLocation, to: CLLocationCoordinate2D(latitude: startBusStop.latitude, longitude: startBusStop.longitude), type: "start")
-        getWalkingFromStopsDirections(from: endLocation, to: CLLocationCoordinate2D(latitude: endBusStop.latitude, longitude: endBusStop.longitude), type: "end")
-        
+//        getWalkingFromStopsDirections(from: startLocation, to: CLLocationCoordinate2D(latitude: startBusStop.latitude, longitude: startBusStop.longitude), type: "start")
+//        getWalkingFromStopsDirections(from: endLocation, to: CLLocationCoordinate2D(latitude: endBusStop.latitude, longitude: endBusStop.longitude), type: "end")
+//        
         // Filter routes that pass through both the start and end bus stops
         let matchingRoutes = startRoutes.filter { route in
             return endRoutes.contains { $0.id == route.id }
@@ -624,21 +667,37 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
     
-    func getWalkingFromStopsDirections(from start: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D, type: String ) {
-        Task {
-            let request = MKDirections.Request()
-            request.source = MKMapItem(placemark: .init(coordinate: start))
-            request.destination = MKMapItem(placemark: .init(coordinate: destination))
-            request.transportType = .walking
-            
-            do {
-                let directions = try await MKDirections(request: request).calculate()
-                    updateRouteDestionation(type: type, directions: directions)
-            } catch {
-                self.updateDataState(.error("Get walking from stops directions failed"))
-            }
+//    func getWalkingFromStopsDirections(from start: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D, type: String ) {
+//        Task {
+//            let request = MKDirections.Request()
+//            request.source = MKMapItem(placemark: .init(coordinate: start))
+//            request.destination = MKMapItem(placemark: .init(coordinate: destination))
+//            request.transportType = .walking
+//            
+//            do {
+//                let directions = try await MKDirections(request: request).calculate()
+//                    updateRouteDestionation(type: type, directions: directions)
+//            } catch {
+//                self.updateDataState(.error("Get walking from stops directions failed"))
+//            }
+//        }
+//    }
+    
+    func getWalkingFromStopsDirections(from start: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D) async throws -> MKRoute {
+        let request = MKDirections.Request()
+        request.source = MKMapItem(placemark: .init(coordinate: start))
+        request.destination = MKMapItem(placemark: .init(coordinate: destination))
+        request.transportType = .walking
+        
+        let directions = try await MKDirections(request: request).calculate()
+        
+        guard let route = directions.routes.first else {
+            throw NSError(domain: "No walking route found", code: 0)
         }
+        
+        return route
     }
+
     
     func updateRouteDestionation(type: String, directions: MKDirections.Response) {
         DispatchQueue.main.async {
