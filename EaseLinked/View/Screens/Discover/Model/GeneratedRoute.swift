@@ -19,6 +19,8 @@ struct GeneratedRoute: Identifiable, Codable {
     var transitAt: String = ""
     var startWalkingDistance: Int
     var endWalkingDistance: Int
+    var startWalkingTime: Int = 0
+    var endWalkingTime: Int = 0
     let estimatedTimeTravel: Int
     var busStop: [BusStop]
     

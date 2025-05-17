@@ -14,7 +14,7 @@ struct RouteSmallDetail: View {
     
     var body: some View {
         HStack {
-            RouteSmallDetailChip(icon: "figure.walk", text: walkingDistance > 1000 ? "\(walkingDistance / 1000) km)" : "\(walkingDistance) m")
+            RouteSmallDetailChip(icon: "figure.walk", text: walkingDistance > 1000 ? "\(walkingDistance / 1000) km" : "\(walkingDistance) m")
             Image(systemName: "circle.fill")
                 .resizable()
                 .frame(width: 4, height: 4)

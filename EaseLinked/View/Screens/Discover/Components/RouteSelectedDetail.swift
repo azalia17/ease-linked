@@ -22,18 +22,22 @@ struct RouteSelectedDetail: View {
             RouteNameDetail(routes: generatedRoutes.routes)
                 .padding(.bottom, 12)
                 .padding(.top, 10)
+            
             Text("Estimated Time Spent: \(estimatedTimeSpent) minutes")
                 .font(.subheadline)
                 .foregroundStyle(Color(.systemGray))
                 .padding(.bottom, 28)
+            
             BusSection(Buses: buses)
                 .padding(.bottom, 28)
+            
             Text("STOPS")
                 .font(.title3)
                 .bold(true)
                 .foregroundStyle(.black)
                 .padding(.bottom, 14)
             PathStart(startLocation: startLocation, walkingDistance: generatedRoutes.startWalkingDistance, walkingTime: startWalkingTime)
+            
             if generatedRoutes.routes.count > 1 {
                 RouteTransitStopDetail(
                     generatedRoutes: generatedRoutes,

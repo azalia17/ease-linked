@@ -52,6 +52,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     
     @Published var startWalkingDistance: Int = 0
     @Published var endWalkingDistance: Int = 0
+    @Published var startWalkingTime: Int = 0
+    @Published var endWalkingTime: Int = 0
     
     @Published var bestRoutes: [Route] = []
     
@@ -249,9 +251,11 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         DispatchQueue.main.async {
             self.routeStartDestination = startRoute
             self.startWalkingDistance = Int(startRoute.distance)
+            self.startWalkingTime = Int(startRoute.expectedTravelTime / 60)
 
             self.routeEndDestination = endRoute
             self.endWalkingDistance = Int(endRoute.distance)
+            self.endWalkingTime = Int(startRoute.expectedTravelTime / 60)
             
             self.updateBestStopAllRoutes(allRoutes: self.updateAllRoutes(allRoutes: allRoutes))
             self.updateDataState(.loaded)
@@ -281,6 +285,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             
             updatedRoutes[i].startWalkingDistance = self.startWalkingDistance
             updatedRoutes[i].endWalkingDistance = self.endWalkingDistance
+            updatedRoutes[i].startWalkingTime = self.startWalkingTime
+            updatedRoutes[i].endWalkingTime = self.endWalkingTime
         }
 
         updatedRoutes = getScheduleTimeStartStop(allRoutes: updatedRoutes)
@@ -373,39 +379,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     func updateAllRoutes(allRoutes : [GeneratedRoute]) -> [GeneratedRoute] {
         return allRoutes.uniqued(by: { $0.busStop.map(\.id).joined(separator: "->") })
     }
-    
-//    func getRouteDetails(_ generatedRoute: GeneratedRoute) {
-//        Task {
-//            generateBusStopCoordinates(from: generatedRoute.busStop)
-//            
-//            let waypoints: [CLLocationCoordinate2D] = busStopsGenerated.map { $0.coordinate }
-//
-//            guard waypoints.count >= 2 else {
-//                self.updateDataState(.error("waypoints is less than 2"))
-//                return
-//            }
-//            
-//            var tempPolyLines: [MKPolyline] = []
-//
-//            for index in 0..<waypoints.count - 1 {
-//                let request = MKDirections.Request()
-//                request.source = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index]))
-//                request.destination = MKMapItem(placemark: MKPlacemark(coordinate: waypoints[index + 1]))
-//                request.transportType = .automobile
-//
-//                do {
-//                    let directions = try await MKDirections(request: request).calculate()
-//                    if let route = directions.routes.first {
-//                        tempPolyLines.append(route.polyline)
-//                    }
-//                } catch {
-//                    self.updateDataState(.error("Error calculating route: \(error.localizedDescription)"))
-//                }
-//            }
-//
-//            addPolyLines(tempPolyLines)
-//        }
-//    }
     
     func getRouteDetails(_ generatedRoute: GeneratedRoute) {
         Task {
@@ -683,17 +656,19 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     }
 
     
-    func updateRouteDestionation(type: String, directions: MKDirections.Response) {
-        DispatchQueue.main.async {
-            if (type == "start") {
-                self.routeStartDestination = directions.routes.first
-                self.startWalkingDistance = Int(directions.routes.first?.distance ?? 0.0)
-            } else {
-                self.routeEndDestination = directions.routes.first
-                self.endWalkingDistance = Int(directions.routes.first?.distance ?? 0.0)
-            }
-        }
-    }
+//    func updateRouteDestionation(type: String, directions: MKDirections.Response) {
+//        DispatchQueue.main.async {
+//            if (type == "start") {
+//                self.routeStartDestination = directions.routes.first
+//                self.startWalkingDistance = Int(directions.routes.first?.distance ?? 0.0)
+////                self.startWalkingTime = Int((directions.routes.first?.expectedTravelTime ?? 0.0) / 60)
+//            } else {
+//                self.routeEndDestination = directions.routes.first
+//                self.endWalkingDistance = Int(directions.routes.first?.distance ?? 0.0)
+////                self.endWalkingTime = Int((directions.routes.first?.expectedTravelTime ?? 0.0) / 60)
+//            }
+//        }
+//    }
     
     func getNextTwoTimesHandlingPassed(from scheduleTimes: [ScheduleTime]) -> [ScheduleTime] {
         let upcoming = scheduleTimes

@@ -183,7 +183,7 @@ struct DiscoverView: View {
                                 ProgressView()
                                     .padding(.top, 40)
                             case .loaded:
-                                RouteSelectedDetail(generatedRoutes: discoverViewModel.selectedRoutes, estimatedTimeSpent: 10, buses: discoverViewModel.selectedRoutes.busses, startLocation: discoverViewModel.startLocationQueryFragment, endLocation: discoverViewModel.endLocationQueryFragment, startWalkingTime: 10, endWalkingTime: 10, scheduleTime: [])
+                                RouteSelectedDetail(generatedRoutes: discoverViewModel.selectedRoutes, estimatedTimeSpent: 10, buses: discoverViewModel.selectedRoutes.busses, startLocation: discoverViewModel.startLocationQueryFragment, endLocation: discoverViewModel.endLocationQueryFragment, startWalkingTime: discoverViewModel.startWalkingTime, endWalkingTime: discoverViewModel.endWalkingTime, scheduleTime: [])
                                     .padding(.horizontal)
                                     .sheet(isPresented: $showInfoSheet) {
                                         RouteInfoSheet(
@@ -210,7 +210,7 @@ struct DiscoverView: View {
                                     .font(.title3)
                                     .bold()
                             } else {
-                                JourneyTile(startWalkingTime: 10, startStop: discoverViewModel.selectedRoutes.busStop[0].name, endStop: discoverViewModel.selectedRoutes.busStop[discoverViewModel.selectedRoutes.busStop.count - 1].name, endWalkingTime: 10)
+                                JourneyTile(startWalkingTime: discoverViewModel.startWalkingTime, startStop: discoverViewModel.selectedRoutes.busStop[0].name, endStop: discoverViewModel.selectedRoutes.busStop[discoverViewModel.selectedRoutes.busStop.count - 1].name, endWalkingTime: discoverViewModel.endWalkingTime)
                             }
                         }
                         
