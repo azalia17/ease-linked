@@ -61,6 +61,7 @@ struct DiscoverView: View {
                                coordinate: identifiableCoordinate.coordinate
                         )
                         .tint(discoverViewModel.selectedRoutes.routes[0].color.gradient)
+//                        .tint(discoverViewModel.selectedRoutes.routes.count > 1 ? AnyShapeStyle(LinearGradient(gradient: Gradient(colors: [discoverViewModel.selectedRoutes.routes[0].color, discoverViewModel.selectedRoutes.routes[1].color]), startPoint: .leading, endPoint: .trailing)) : AnyShapeStyle(discoverViewModel.selectedRoutes.routes[0].color))
                     }
                     MapPolyline(discoverViewModel.routeStartDestination!)
                         .stroke(Color(.systemGray), style: StrokeStyle(lineWidth: 5, lineCap: .round,dash: [1, 8]))
@@ -71,6 +72,7 @@ struct DiscoverView: View {
                     ForEach(discoverViewModel.selectedRoutes.routePolylines, id: \.self) { polyline in
                         MapPolyline(polyline)
                             .stroke(discoverViewModel.selectedRoutes.routes[0].color, lineWidth: 5)
+//                            .stroke(discoverViewModel.selectedRoutes.routes.count > 1 ? AnyShapeStyle(LinearGradient(gradient: Gradient(colors: [discoverViewModel.selectedRoutes.routes[0].color, discoverViewModel.selectedRoutes.routes[1].color]), startPoint: .leading, endPoint: .trailing)) : AnyShapeStyle(discoverViewModel.selectedRoutes.routes[0].color), lineWidth: 5)
                     }
                 }
             }
@@ -210,11 +212,21 @@ struct DiscoverView: View {
                     case .loaded:
                         if discoverViewModel.viewState == .result {
                             VStack {
-                                if discoverViewModel.viewState == .result {
+                                if discoverViewModel.availableRoutes.count > 0 {
                                     RoutesResult(
                                         generatedRoutes: discoverViewModel.availableRoutes,
                                         action: discoverViewModel.selectRoute
                                     )
+                                } else {
+                                    Text("Sorry No Route's Found")
+                                        .font(.title)
+                                        .foregroundStyle(.secondary)
+                                        .padding(.top, 20)
+                                    Text("Please try **search for new locations**!")
+                                        .font(.body)
+                                        .foregroundStyle(.secondary)
+                                        .padding(.top, 4)
+                                    Spacer()
                                 }
                             }
                         }
@@ -247,9 +259,15 @@ struct DiscoverView: View {
                     .toolbar(content: {
                         ToolbarItem(placement: .topBarLeading) {
                             if discoverViewModel.viewState == .result {
-                                Text("\(discoverViewModel.availableRoutes.count) routes you can take")
-                                    .font(.title3)
-                                    .bold()
+                                if discoverViewModel.availableRoutes.count == 0 || discoverViewModel.dataState == .loading {
+                                    Text("Routes you can take")
+                                        .font(.title3)
+                                        .bold()
+                                } else {
+                                    Text("\(discoverViewModel.availableRoutes.count) routes you can take")
+                                        .font(.title3)
+                                        .bold()
+                                }
                             } else {
                                 JourneyTile(startWalkingTime: discoverViewModel.selectedRoutes.startWalkingTime, startStop: discoverViewModel.selectedRoutes.busStop[0].name, endStop: discoverViewModel.selectedRoutes.busStop[discoverViewModel.selectedRoutes.busStop.count - 1].name, endWalkingTime: discoverViewModel.selectedRoutes.endWalkingTime)
                             }

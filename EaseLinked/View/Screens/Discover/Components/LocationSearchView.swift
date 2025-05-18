@@ -42,6 +42,7 @@ struct LocationSearchView: View {
                             start: discoverViewModel.startLocationSearch,
                             end: discoverViewModel.endLocationSearch
                         )
+                        discoverViewModel.search()
                     },
                     resetResultsCompletion: {
                         discoverViewModel.resetResultsCompletion()
