@@ -319,3 +319,18 @@ extension Array {
     }
 }
 
+
+func formattedNoteText(from string: String) -> Text {
+    let components = string.components(separatedBy: "**")
+    var result = Text("")
+
+    for (index, part) in components.enumerated() {
+        if index % 2 == 1 {
+            result = result + Text(part.capitalizingFirstLetter()).bold()
+        } else {
+            result = result + Text(part.capitalizingFirstLetter())
+        }
+    }
+
+    return result
+}

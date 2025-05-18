@@ -66,7 +66,8 @@ struct RouteInfoSheet: View {
                                     Image(systemName: "circle.fill")
                                         .resizable()
                                         .frame(width: 4, height: 4)
-                                    Text(note.capitalizingFirstLetter())
+                                    
+                                    formattedNoteText(from: note)
                                         .fixedSize(horizontal: false, vertical: true)
                                         .lineLimit(nil)
                                         .font(.footnote)

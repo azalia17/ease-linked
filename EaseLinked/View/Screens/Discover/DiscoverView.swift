@@ -112,7 +112,7 @@ struct DiscoverView: View {
             case .result, .routeDetail :
                 SearchCardMinimize(
                     action: {
-                        discoverViewModel.backToInitialState()
+                        discoverViewModel.showSearchLocation()
                     },
                     from: discoverViewModel.startLocationQueryFragment,
                     to: discoverViewModel.endLocationQueryFragment
@@ -133,13 +133,22 @@ struct DiscoverView: View {
                                 action: {
                                     discoverViewModel.reRoute()
                                 }) {
-                                    Image(systemName: "point.topright.arrow.triangle.backward.to.point.bottomleft.scurvepath.fill")
-                                        .font(.system(size: 16, weight: .medium))
-                                        .frame(width: 36, height: 36)
-                                        .background(.white)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                                        .shadow(radius: 1, x: 0, y: 1)
+                                    if discoverViewModel.reRouteState == .loading {
+                                        ProgressView()
+                                            .frame(width: 36, height: 36)
+                                            .background(.white)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                            .shadow(radius: 1, x: 0, y: 1)
+                                    } else {
+                                        Image(systemName: "point.topright.arrow.triangle.backward.to.point.bottomleft.scurvepath.fill")
+                                            .font(.system(size: 16, weight: .medium))
+                                            .frame(width: 36, height: 36)
+                                            .background(.white)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                            .shadow(radius: 1, x: 0, y: 1)
+                                    }
                                 }
+                                .disabled(discoverViewModel.reRouteState == .loading)
                         } else {
                             Rectangle()
                                 .frame(width: 36, height: 36)

@@ -21,10 +21,16 @@ enum DiscoverDataState: Equatable {
     case error(String)
 }
 
+enum RerouteState: Equatable {
+    case initial
+    case loading
+}
+
 
 final class DiscoverViewModel : NSObject, ObservableObject {
     @Published var viewState: DiscoverViewState = .initial
     @Published var dataState: DiscoverDataState = .loading
+    @Published var reRouteState: RerouteState = .initial
     
     @Published var activeTextField: String = "from"
     @Published var isTimePicked: Bool = false
@@ -348,23 +354,21 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     
     func getStartBusStopIndex(allRoutes: GeneratedRoute, index: Int) -> Int {
         let updatedRoutes = allRoutes
-
-//        for i in 0..<updatedRoutes.count {
-            guard
-                updatedRoutes.busStop.count >= 2,
-                let route = updatedRoutes.routes.first
-            else { return -1 }
-
-            let fromStop = updatedRoutes.busStop[index].id
-            let toStop = updatedRoutes.busStop[index + 1].id
-
-            // Find the correct index in the route's busStops
-            for j in 0..<(route.busStops.count - 1) {
-                if route.busStops[j] == fromStop && route.busStops[j + 1] == toStop {
-                    return j
-                }
+        
+        guard
+            updatedRoutes.busStop.count >= 2,
+            let route = updatedRoutes.routes.first
+        else { return -1 }
+        
+        let fromStop = updatedRoutes.busStop[index].id
+        let toStop = updatedRoutes.busStop[index + 1].id
+        
+        for j in 0..<(route.busStops.count - 1) {
+            if route.busStops[j] == fromStop && route.busStops[j + 1] == toStop {
+                return j
             }
-//        }
+        }
+        
         return -1
     }
     
@@ -383,7 +387,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             
             scheduleTime.sort(by: { $0.time < $1.time })
             
-            // ✅ Update isPassed based on current time
             let now = Date()
             for j in 0..<scheduleTime.count {
                 scheduleTime[j].isPassed = scheduleTime[j].time < now
@@ -402,29 +405,26 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     func getScheduleTimeTransitStop(allRoutes: GeneratedRoute) -> GeneratedRoute {
         var updatedRoutes = allRoutes
         
-//        for i in 0..<updatedRoutes.count {
-            let scheduleUsed = updatedRoutes.routes[1].schedule
-            
-            var scheduleTime = ScheduleDetail.getScheduleTimes(
-                schedule: scheduleUsed,
-                index: updatedRoutes.transitStopScheduleId,
-                busStopId: updatedRoutes.transitBusStop[0].id,
-                route: updatedRoutes.routes[1].id
-            )
+        let scheduleUsed = updatedRoutes.routes[1].schedule
+        
+        var scheduleTime = ScheduleDetail.getScheduleTimes(
+            schedule: scheduleUsed,
+            index: updatedRoutes.transitStopScheduleId,
+            busStopId: updatedRoutes.transitBusStop[0].id,
+            route: updatedRoutes.routes[1].id
+        )
         
         scheduleTime.sort(by: { $0.time < $1.time })
-
-            
-            // ✅ Update isPassed based on current time
-            let now = Date()
-            for j in 0..<scheduleTime.count {
-                scheduleTime[j].isPassed = scheduleTime[j].time < now
-            }
-            
-            updatedRoutes.transitStopScheduleTime = scheduleTime
-            
-            updatedRoutes.twoEarliestTransitime = getNextTwoTimesHandlingPassed(from: scheduleTime)
-//        }
+        
+        
+        let now = Date()
+        for j in 0..<scheduleTime.count {
+            scheduleTime[j].isPassed = scheduleTime[j].time < now
+        }
+        
+        updatedRoutes.transitStopScheduleTime = scheduleTime
+        
+        updatedRoutes.twoEarliestTransitime = getNextTwoTimesHandlingPassed(from: scheduleTime)
         
         return updatedRoutes
     }
@@ -733,13 +733,6 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         return route
     }
     
-    func isRoutable(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) -> Bool {
-        let distance = CLLocation(latitude: from.latitude, longitude: from.longitude)
-            .distance(from: CLLocation(latitude: to.latitude, longitude: to.longitude))
-        return distance < 50000 // ~50km, tweak as needed
-    }
-
-    
     func getNextTwoTimesHandlingPassed(from scheduleTimes: [ScheduleTime]) -> [ScheduleTime] {
         let upcoming = scheduleTimes
             .filter { !$0.isPassed }
@@ -757,6 +750,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     
     func reRoute() {
         Task {
+            updateReRouteState(.loading)
             var updatedRoute = selectedRoutes
 
             var tempPolylines: [MKPolyline] = []
@@ -792,16 +786,21 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             updatedRoute.codablePolylines = codablePolylines
             updatedRoute.estimatedTimeTravel = Int(totalTime / 60) + self.startWalkingTime + self.endWalkingTime
             updateReRouteUI(updatedRoute: updatedRoute, tempPolylines: tempPolylines)
+            updateReRouteState(.initial)
+        }
+    }
+    
+    func updateReRouteState(_ newState: RerouteState) {
+        DispatchQueue.main.async {
+            self.reRouteState = newState
         }
     }
 
     func updateReRouteUI(updatedRoute: GeneratedRoute, tempPolylines: [MKPolyline]) {
         DispatchQueue.main.async {
-            // Update selected route
             self.selectedRoutes = updatedRoute
             self.routePolylines = tempPolylines
 
-            // Update availableRoutes with new polyline/ETA
             if let index = self.availableRoutes.firstIndex(where: { $0.id == updatedRoute.id }) {
                 self.availableRoutes[index] = updatedRoute
             }
@@ -871,19 +870,19 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     
     func backToSearchSheet() {
         updateViewState(.search)
+        updateReRouteState(.initial)
         availableRoutes = []
     }
     
     func selectRoute(generatedRoute: GeneratedRoute) {
         self.updateViewState(.routeDetail)
         self.updateDataState(.loading)
+        self.updateReRouteState(.initial)
         selectedRoutes = generatedRoute
         if selectedRoutes.routes.count > 1 {
             selectedRoutes.transitStopScheduleId = getTransitStopIndex(
                 updatedRoutes: selectedRoutes
             )
-            print("transit \(selectedRoutes.transitStopScheduleId)")
-            
             selectedRoutes = getScheduleTimeTransitStop(allRoutes: selectedRoutes)
         }
         
@@ -924,6 +923,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         self.endLocationQueryFragment = ""
         self.busStopsGenerated = []
         self.selectedRoutes = GeneratedRoute(eta: 0, totalBusStop: 0, bestEta: false, bestStop: false, routes: Route.all, startWalkingDistance: 0, endWalkingDistance: 0, estimatedTimeTravel: 0, busStop: BusStop.all)
+        self.reRouteState = .initial
     }
 }
 
