@@ -925,6 +925,27 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         self.selectedRoutes = GeneratedRoute(eta: 0, totalBusStop: 0, bestEta: false, bestStop: false, routes: Route.all, startWalkingDistance: 0, endWalkingDistance: 0, estimatedTimeTravel: 0, busStop: BusStop.all)
         self.reRouteState = .initial
     }
+    
+    func saveSelectedRoutes() -> SavedRouteModel  {
+        let routesId = self.selectedRoutes.routesId
+        let busStopId = self.selectedRoutes.busStop.map({$0.id})
+        let busesId = self.selectedRoutes.busses.map({$0.id})
+        
+        let transitBusStop = if selectedRoutes.routes.count > 1 {
+            self.selectedRoutes.transitBusStop[0].id
+        } else {""}
+        let fromStartToTransitBusStopId = if selectedRoutes.routes.count > 1 {
+            self.selectedRoutes.fromStartToTransit.map({$0.id})
+        } else {[""]}
+        
+        let fromTransitToEndBusStopId = if selectedRoutes.routes.count > 1 {
+            self.selectedRoutes.fromTransitToEnd.map({$0.id})
+        } else {[""]}
+        
+        
+        return SavedRouteModel(startLocation: self.startLocationQueryFragment, endLocation: self.endLocationQueryFragment, eta: self.selectedRoutes.eta, totalBusSTops: self.selectedRoutes.totalBusStop, routesId: routesId, startWalkingDistance: self.startWalkingDistance, endWalkingDistance: self.endWalkingDistance, startWalkingTime: self.startWalkingTime, endWalkingTime: self.endWalkingTime, estimatedTimeTravel: self.selectedRoutes.estimatedTimeTravel, busStopsId: busStopId, startStopScheduleId: self.selectedRoutes.startStopScheduleId, transitStopScheduleId: self.selectedRoutes.transitStopScheduleId, polylineSegments: self.selectedRoutes.routePolylines, bussesId: busesId, transitBusStopId: transitBusStop, fromStartToTransitBusStopId: fromStartToTransitBusStopId, fromTransitToEndBusStopId: fromTransitToEndBusStopId)
+        
+    }
 }
 
 

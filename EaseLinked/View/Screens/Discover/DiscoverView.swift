@@ -7,11 +7,13 @@
 
 import SwiftUI
 import MapKit
+import SwiftData
 
 struct DiscoverView: View {
     @StateObject var discoverViewModel: DiscoverViewModel
     
-    var cameraPositions: MapCameraPosition = .region(.init(center: .init(latitude: -6.305968, longitude: 106.672272), latitudinalMeters: 4000, longitudinalMeters: 4000))
+    @Environment(\.modelContext) var modelContext
+    
     let locationManager = CLLocationManager()
     
     @State private var cameraPosition: MapCameraPosition = .userLocation(fallback: .region(
@@ -278,7 +280,7 @@ struct DiscoverView: View {
                                 if discoverViewModel.viewState == .routeDetail {
                                     Button(
                                         action: {
-                                            
+                                            modelContext.insert(discoverViewModel.saveSelectedRoutes())
                                         },
                                         label : {
                                             Image(systemName: "plus")

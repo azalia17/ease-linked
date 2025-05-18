@@ -30,7 +30,7 @@ struct GeneratedRoute: Identifiable, Codable {
     var estimatedTimeTravel: Int
     var busStop: [BusStop]
     
-    var schedulesByStop: [String: [String]] = [:]
+//    var schedulesByStop: [String: [String]] = [:]
     
     var startStopScheduleId: Int = -1
     var startStopScheduleTime: [ScheduleTime] = []

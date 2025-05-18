@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct EaseLinkedApp: App {
@@ -13,5 +14,6 @@ struct EaseLinkedApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: SavedRouteModel.self)
     }
 }
