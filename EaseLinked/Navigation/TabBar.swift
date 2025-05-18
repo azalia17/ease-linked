@@ -33,6 +33,14 @@ struct TabBar: View {
                    showSheet = true
                 }
             }
+            
+            LibraryView()
+                .tabItem {
+                    Label("Library", systemImage: "plus")
+                }
+                .onAppear {
+                    showSheet = false
+                }
 
             RouteListView()
                 .tabItem {
