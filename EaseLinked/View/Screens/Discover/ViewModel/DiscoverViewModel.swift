@@ -26,11 +26,16 @@ enum RerouteState: Equatable {
     case loading
 }
 
+enum SaveRouteState: Equatable {
+    case initial
+    case loading
+}
 
 final class DiscoverViewModel : NSObject, ObservableObject {
     @Published var viewState: DiscoverViewState = .initial
     @Published var dataState: DiscoverDataState = .loading
     @Published var reRouteState: RerouteState = .initial
+    @Published var saveRouteState: SaveRouteState = .initial
     
     @Published var activeTextField: String = "from"
     @Published var isTimePicked: Bool = false
@@ -748,7 +753,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
     
-    func reRoute() {
+    func reRoute(_ fromSaved: Bool = false) {
         Task {
             updateReRouteState(.loading)
             var updatedRoute = selectedRoutes
@@ -785,7 +790,7 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             let codablePolylines = tempPolylines.map { CodablePolyline(polyline: $0) }
             updatedRoute.codablePolylines = codablePolylines
             updatedRoute.estimatedTimeTravel = Int(totalTime / 60) + self.startWalkingTime + self.endWalkingTime
-            updateReRouteUI(updatedRoute: updatedRoute, tempPolylines: tempPolylines)
+            updateReRouteUI(updatedRoute: updatedRoute, tempPolylines: tempPolylines, fromSaved: fromSaved)
             updateReRouteState(.initial)
         }
     }
@@ -796,16 +801,23 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
 
-    func updateReRouteUI(updatedRoute: GeneratedRoute, tempPolylines: [MKPolyline]) {
+    func updateReRouteUI(updatedRoute: GeneratedRoute, tempPolylines: [MKPolyline], fromSaved: Bool) {
         DispatchQueue.main.async {
             self.selectedRoutes = updatedRoute
             self.routePolylines = tempPolylines
 
             if let index = self.availableRoutes.firstIndex(where: { $0.id == updatedRoute.id }) {
                 self.availableRoutes[index] = updatedRoute
+                self.availableRoutes[index].isSaved = fromSaved
             }
-
+            
+            if fromSaved {
+                self.updateSavedRouteUI(updatedRoute: self.selectedRoutes)
+            }
+            
+//            self.updateSaveRouteState(.initial)
             self.updateDataState(.loaded)
+            
         }
     }
     
@@ -896,6 +908,12 @@ final class DiscoverViewModel : NSObject, ObservableObject {
         }
     }
     
+    func updateSaveRouteState(_ newState: SaveRouteState) {
+        DispatchQueue.main.async {
+            self.saveRouteState = newState
+        }
+    }
+    
     func backToInitialState() {
         self.updateViewState(.initial)
         self.activeTextField = "from"
@@ -927,6 +945,8 @@ final class DiscoverViewModel : NSObject, ObservableObject {
     }
     
     func saveSelectedRoutes() -> SavedRouteModel  {
+        self.updateSaveRouteState(.loading)
+        
         let routesId = self.selectedRoutes.routesId
         let busStopId = self.selectedRoutes.busStop.map({$0.id})
         let busesId = self.selectedRoutes.busses.map({$0.id})
@@ -942,9 +962,31 @@ final class DiscoverViewModel : NSObject, ObservableObject {
             self.selectedRoutes.fromTransitToEnd.map({$0.id})
         } else {[""]}
         
+        var mkPolylines: [MKPolyline]
+
+        if selectedRoutes.routePolylines.count != selectedRoutes.busStop.count - 1 {
+            self.reRoute(true)
+            mkPolylines = self.selectedRoutes.routePolylines
+        } else {
+            mkPolylines = self.selectedRoutes.routePolylines
+            updateSavedRouteUI(updatedRoute: self.selectedRoutes)
+        }
         
-        return SavedRouteModel(startLocation: self.startLocationQueryFragment, endLocation: self.endLocationQueryFragment, eta: self.selectedRoutes.eta, totalBusSTops: self.selectedRoutes.totalBusStop, routesId: routesId, startWalkingDistance: self.startWalkingDistance, endWalkingDistance: self.endWalkingDistance, startWalkingTime: self.startWalkingTime, endWalkingTime: self.endWalkingTime, estimatedTimeTravel: self.selectedRoutes.estimatedTimeTravel, busStopsId: busStopId, startStopScheduleId: self.selectedRoutes.startStopScheduleId, transitStopScheduleId: self.selectedRoutes.transitStopScheduleId, polylineSegments: self.selectedRoutes.routePolylines, bussesId: busesId, transitBusStopId: transitBusStop, fromStartToTransitBusStopId: fromStartToTransitBusStopId, fromTransitToEndBusStopId: fromTransitToEndBusStopId)
+        return SavedRouteModel(startLocation: self.startLocationQueryFragment, endLocation: self.endLocationQueryFragment, eta: self.selectedRoutes.eta, totalBusSTops: self.selectedRoutes.totalBusStop, routesId: routesId, startWalkingDistance: self.startWalkingDistance, endWalkingDistance: self.endWalkingDistance, startWalkingTime: self.startWalkingTime, endWalkingTime: self.endWalkingTime, estimatedTimeTravel: self.selectedRoutes.estimatedTimeTravel, busStopsId: busStopId, startStopScheduleId: self.selectedRoutes.startStopScheduleId, transitStopScheduleId: self.selectedRoutes.transitStopScheduleId, polylineSegments: mkPolylines, bussesId: busesId, transitBusStopId: transitBusStop, fromStartToTransitBusStopId: fromStartToTransitBusStopId, fromTransitToEndBusStopId: fromTransitToEndBusStopId, dateSaved: Date.now)
         
+    }
+    
+    func updateSavedRouteUI(updatedRoute: GeneratedRoute) {
+        DispatchQueue.main.async {
+            self.selectedRoutes.isSaved = true
+
+            if let index = self.availableRoutes.firstIndex(where: { $0.id == updatedRoute.id }) {
+                self.availableRoutes[index].isSaved = true
+            }
+
+            self.updateDataState(.loaded)
+            self.updateSaveRouteState(.initial)
+        }
     }
 }
 

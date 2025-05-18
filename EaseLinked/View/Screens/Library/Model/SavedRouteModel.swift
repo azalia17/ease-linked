@@ -38,6 +38,8 @@ class SavedRouteModel {
     var transitBusStopId: String
     var fromStartToTransitBusStopId: [String]
     var fromTransitToEndBusStopId: [String]
+    
+    var dateSaved: Date
 
     init(
             generatedRouteId: UUID = UUID(),
@@ -58,7 +60,8 @@ class SavedRouteModel {
             bussesId: [String],
             transitBusStopId: String,
             fromStartToTransitBusStopId: [String],
-            fromTransitToEndBusStopId: [String]
+            fromTransitToEndBusStopId: [String],
+            dateSaved: Date = Date() 
     ) {
         self.id = UUID()
         self.generatedRouteId = generatedRouteId
@@ -80,6 +83,7 @@ class SavedRouteModel {
         self.transitBusStopId = transitBusStopId
         self.fromStartToTransitBusStopId = fromStartToTransitBusStopId
         self.fromTransitToEndBusStopId = fromTransitToEndBusStopId
+        self.dateSaved = dateSaved
     }
 
         var decodedPolylines: [MKPolyline] {

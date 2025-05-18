@@ -20,7 +20,11 @@ struct LibraryView: View {
             } else {
                 List {
                     ForEach(savedRoutes) { route in
-                        Text("\(route.startLocation) -> \(route.endLocation)")
+                        VStack{
+                            Text("\(route.routesId)")
+                            Text("\(formatTime(from:route.dateSaved))")
+                            Text("\(route.startLocation) -> \(route.endLocation)")
+                        }
                     }
                 }
             }

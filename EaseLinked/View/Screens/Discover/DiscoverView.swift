@@ -283,9 +283,12 @@ struct DiscoverView: View {
                                             modelContext.insert(discoverViewModel.saveSelectedRoutes())
                                         },
                                         label : {
-                                            Image(systemName: "plus")
-                                                .bold()
-                                                .foregroundStyle(Color(.systemGray))
+                                            if discoverViewModel.saveRouteState == .loading {
+                                                ProgressView()                                        } else {
+                                                Image(systemName: discoverViewModel.selectedRoutes.isSaved ? "checkmark" : "plus")
+                                                    .bold()
+                                                    .foregroundStyle(Color(.systemGray))
+                                            }
                                         })
                                     .buttonStyle(.bordered)
                                     .background(Color(.systemGray2))
@@ -324,9 +327,8 @@ struct DiscoverView: View {
                             }
                         }
                     }
-                    )
+                )
             }
-            
             .presentationDetents([.height(60), .medium, .large], selection: $selectedDetent)
             .interactiveDismissDisabled()
             .presentationBackgroundInteraction(.enabled(upThrough: .large))

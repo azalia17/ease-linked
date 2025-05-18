@@ -30,7 +30,7 @@ struct GeneratedRoute: Identifiable, Codable {
     var estimatedTimeTravel: Int
     var busStop: [BusStop]
     
-//    var schedulesByStop: [String: [String]] = [:]
+    var isSaved: Bool = false
     
     var startStopScheduleId: Int = -1
     var startStopScheduleTime: [ScheduleTime] = []
@@ -148,3 +148,4 @@ struct IdentifiableCoordinate: Identifiable {
     let busStopName: String
     let busStopId: String
 }
+
